@@ -1,98 +1,97 @@
 namespace GameOfLife.Models;
 
-public partial class Game
+public class GridDrawingScene : Scene
 {
-  public class GridDrawingScene : Scene
+  public static List<List<bool>> Cells    = new();
+  public static List<List<bool>> NewCells = new();
+
+  public static float CellWidth;
+  public static float CellHeight;
+
+  public GridDrawingScene(SceneInitObject init) : base(init) { }
+
+  public void InitGrid()
   {
-    public static List<List<bool>> cells = new();
-    public static List<List<bool>> newCells = new();
+    UpdateCellSize();
 
-    public static float CellWidth;
-    public static float CellHeight;
-
-    public void InitGrid()
+    for (int row = 0; row < OptionsState.GridRows; row++)
     {
-      UpdateCellSize();
+      Cells.Add(new List<bool>());
+      NewCells.Add(new List<bool>());
 
-      for (int row = 0; row < Options.GridRows; row++)
+      for (int col = 0; col < OptionsState.GridColumns; col++)
       {
-        cells.Add(new List<bool>());
-        newCells.Add(new List<bool>());
+        Cells[row].Add(false);
+        NewCells[row].Add(false);
+      }
+    }
+  }
 
-        for (int col = 0; col < Options.GridColumns; col++)
-        {
-          cells[row].Add(false);
-          newCells[row].Add(false);
-        }
+  public void DrawGrid()
+  {
+    DrawGridCells();
+
+    if (OptionsState.ShouldDrawGrid)
+      DrawGridGrid();
+  }
+
+  public void DrawGridGrid()
+  {
+    SDL_Color c = Renderer.GetDrawColor();
+    Renderer.SetDrawColor(Colors["Grid"]);
+
+    float rowsSpacing    = (float)Window.Height / OptionsState.GridColumns;
+    float columnsSpacing = (float)Window.Width / OptionsState.GridRows;
+
+    for (int i = 0; i < OptionsState.GridRows; i++)
+    {
+      float y = rowsSpacing * i;
+      Renderer.DrawLine(0, y, Window.Width, y);
+
+      for (int j = 0; j < OptionsState.GridColumns; j++)
+      {
+        float x = columnsSpacing * j;
+        Renderer.DrawLine(x, 0, x, Window.Height);
       }
     }
 
-    public void DrawGrid()
-    {
-      DrawGridCells();
+    Renderer.SetDrawColor(c);
+  }
 
-      if (Options.ShouldDrawGrid)
-        DrawGridGrid();
+  public void DrawGridCells()
+  {
+    SDL_Color initialColor = Renderer.GetDrawColor();
+    Renderer.SetDrawColor(Colors["Cell"]);
+
+    var cellRect = new SDL_FRect
+    {
+      w = CellWidth,
+      h = CellHeight
+    };
+
+    for (int row = 0; row < OptionsState.GridRows; row++)
+    for (int col = 0; col < OptionsState.GridColumns; col++)
+    {
+      if (!Cells[row][col]) continue;
+
+      cellRect.x = col * CellWidth;
+      cellRect.y = row * CellHeight;
+
+      Renderer.FillRect(cellRect);
     }
 
-    public void DrawGridGrid()
-    {
-      SDL_Color c = Render.GetDrawColor();
-      Render.SetDrawColor(Game.GridColor);
+    Renderer.SetDrawColor(initialColor);
+  }
 
-      float rowsSpacing    = (float)Window.Height / Options.GridColumns;
-      float columnsSpacing = (float)Window.Width / Options.GridRows;
+  public void DisposeGrid()
+  {
+    Cells.Clear();
+    NewCells.Clear();
+  }
 
-      for (int i = 0; i < Options.GridRows; i++)
-      {
-        float y = rowsSpacing * i;
-        Render.DrawLine(0, y, Window.Width, y);
-
-        for (int j = 0; j < Options.GridColumns; j++)
-        {
-          float x = columnsSpacing * j;
-          Render.DrawLine(x, 0, x, Window.Height);
-        }
-      }
-
-      Render.SetDrawColor(c);
-    }
-
-    public void DrawGridCells()
-    {
-      SDL_Color initialColor = Render.GetDrawColor();
-      Render.SetDrawColor(Game.CellColor);
-
-      var cellRect = new SDL_FRect
-      {
-        w = CellWidth,
-        h = CellHeight
-      };
-
-      for (int row = 0; row < Options.GridRows; row++)
-      for (int col = 0; col < Options.GridColumns; col++)
-      {
-        if (!cells[row][col]) continue;
-
-        cellRect.x = col * CellWidth;
-        cellRect.y = row * CellHeight;
-
-        Render.FillRect(cellRect);
-      }
-
-      Render.SetDrawColor(initialColor);
-    }
-
-    public void DisposeGrid()
-    {
-      cells.Clear();
-      newCells.Clear();
-    }
-
-    public void UpdateCellSize()
-    {
-      CellWidth  = (float)Window.Width / Options.GridRows;
-      CellHeight = (float)Window.Height / Options.GridColumns;
-    }
+  public void UpdateCellSize()
+  {
+    CellWidth  = (float)Window.Width / OptionsState.GridRows;
+    CellHeight = (float)Window.Height / OptionsState.GridColumns;
   }
 }

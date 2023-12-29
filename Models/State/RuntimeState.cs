@@ -1,6 +1,6 @@
 namespace GameOfLife.Models;
 
-public class RunningData
+public class RuntimeState
 {
   private int _fps;
   private int _frameIndex;

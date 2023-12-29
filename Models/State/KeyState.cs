@@ -1,6 +1,6 @@
 namespace GameOfLife.Models;
 
-public class KeyData
+public class KeyState
 {
   public bool         KeyPressed   = false;
   public bool         ShiftPressed = false;

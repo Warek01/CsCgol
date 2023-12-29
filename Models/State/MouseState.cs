@@ -1,6 +1,6 @@
 namespace GameOfLife.Models;
 
-public class MouseData
+public class MouseState
 {
   public int  X;
   public int  Y;

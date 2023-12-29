@@ -1,6 +1,6 @@
 namespace GameOfLife.Models;
 
-public class GameOptions
+public class OptionsState
 {
   public int  GridRows;
   public int  GridColumns;

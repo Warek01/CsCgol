@@ -1,86 +1,84 @@
 namespace GameOfLife.Models;
 
-public partial class Game
+public abstract class Scene : IDisposable
 {
-  public abstract class Scene : IDisposable
+  protected readonly KeyState     Keyboard;
+  protected readonly MouseState   Mouse;
+  protected readonly WindowState  Window;
+  protected readonly Renderer     Renderer;
+  protected readonly OptionsState OptionsState;
+  protected readonly RuntimeState Runtime;
+  protected readonly IGame        Game;
+
+  protected readonly Dictionary<string, IntPtr>    Fonts;
+  protected readonly Dictionary<string, SDL_Color> Colors;
+
+  private readonly Dictionary<SDL_EventType, Action> _eventDict;
+
+  public Scene(SceneInitObject init)
   {
-    public string Name = "Anonymous";
+    Game         = init.Game;
+    Keyboard     = init.State.Keyboard;
+    Mouse        = init.State.Mouse;
+    Window       = init.State.Window;
+    OptionsState = init.State.Options;
+    Runtime      = init.State.Runtime;
+    Renderer     = init.Renderer;
+    Fonts        = init.Fonts;
+    Colors       = init.Colors;
 
-    protected Game        Game     = null!;
-    protected KeyData     Keyboard = null!;
-    protected MouseData   Mouse    = null!;
-    protected WindowData  Window   = null!;
-    protected Renderer    Render   = null!;
-    protected GameOptions Options  = null!;
-    protected RunningData Running  = null!;
-
-    private Dictionary<SDL_EventType, Action> _eventDict = null!;
-
-    public void Init(Game game)
+    _eventDict = new()
     {
-      Game     = game;
-      Keyboard = game.Keyboard;
-      Mouse    = game.Mouse;
-      Window   = game.Window;
-      Render   = game.Render;
-      Options  = game.Options;
-      Running  = Game.Running;
+      [SDL_KEYDOWN]         = OnKeyDown,
+      [SDL_KEYUP]           = OnKeyUp,
+      [SDL_MOUSEBUTTONDOWN] = OnMouseDown,
+      [SDL_MOUSEBUTTONUP]   = OnMouseUp,
+      [SDL_MOUSEMOTION]     = OnMouseMove,
+    };
+  }
 
-      _eventDict = new()
-      {
-        [SDL_KEYDOWN]         = OnKeyDown,
-        [SDL_KEYUP]           = OnKeyUp,
-        [SDL_MOUSEBUTTONDOWN] = OnMouseDown,
-        [SDL_MOUSEBUTTONUP]   = OnMouseUp,
-        [SDL_MOUSEMOTION]     = OnMouseMove,
-      };
+  public void HandleEvent(SDL_Event e)
+  {
+    if (e.type == SDL_WINDOWEVENT)
+      HandleWindowEvent(e);
+    else if (_eventDict.ContainsKey(e.type))
+      _eventDict[e.type]();
+  }
 
-      OnInit();
-    }
+  public virtual void OnInit()             { }
+  public virtual void OnRender()           { }
+  public virtual void OnMouseDown()        { }
+  public virtual void OnMouseUp()          { }
+  public virtual void OnMouseMove()        { }
+  public virtual void OnKeyDown()          { }
+  public virtual void OnKeyUp()            { }
+  public virtual void OnToggleFullscreen() { }
+  public virtual void OnWindowResize()     { }
+  public virtual void OnFocusLost()        { }
+  public virtual void OnFocusGain()        { }
 
-    public void HandleEvent(SDL_Event e)
+  public virtual void Dispose() { }
+
+  public override string ToString()
+  {
+    return GetType().Name;
+  }
+
+  private void HandleWindowEvent(SDL_Event e)
+  {
+    switch (e.window.windowEvent)
     {
-      if (e.type == SDL_WINDOWEVENT)
-        HandleWindowEvent(e);
-      else if (_eventDict.ContainsKey(e.type))
-        _eventDict[e.type]();
-    }
-
-    public virtual void OnInit()             { }
-    public virtual void OnRender()           { }
-    public virtual void OnMouseDown()        { }
-    public virtual void OnMouseUp()          { }
-    public virtual void OnMouseMove()        { }
-    public virtual void OnKeyDown()          { }
-    public virtual void OnKeyUp()            { }
-    public virtual void OnToggleFullscreen() { }
-    public virtual void OnWindowResize()     { }
-    public virtual void OnFocusLost()        { }
-    public virtual void OnFocusGain()        { }
-
-    public virtual void Dispose() { }
-
-    public override string ToString()
-    {
-      return Name;
-    }
-
-    private void HandleWindowEvent(SDL_Event e)
-    {
-      switch (e.window.windowEvent)
-      {
-        case SDL_WINDOWEVENT_RESIZED:
-        case SDL_WINDOWEVENT_MAXIMIZED:
-        case SDL_WINDOWEVENT_RESTORED:
-          OnWindowResize();
-          break;
-        case SDL_WINDOWEVENT_FOCUS_LOST:
-          OnFocusLost();
-          break;
-        case SDL_WINDOWEVENT_FOCUS_GAINED:
-          OnFocusGain();
-          break;
-      }
+      case SDL_WINDOWEVENT_RESIZED:
+      case SDL_WINDOWEVENT_MAXIMIZED:
+      case SDL_WINDOWEVENT_RESTORED:
+        OnWindowResize();
+        break;
+      case SDL_WINDOWEVENT_FOCUS_LOST:
+        OnFocusLost();
+        break;
+      case SDL_WINDOWEVENT_FOCUS_GAINED:
+        OnFocusGain();
+        break;
     }
   }
 }
