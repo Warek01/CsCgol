@@ -40,8 +40,8 @@ public class GridDrawingScene : Scene
     SDL_Color c = Renderer.GetDrawColor();
     Renderer.SetDrawColor(Colors["Grid"]);
 
-    float rowsSpacing    = (float)Window.Height / OptionsState.GridColumns;
-    float columnsSpacing = (float)Window.Width / OptionsState.GridRows;
+    float rowsSpacing    = (float)Window.Height / OptionsState.GridRows;
+    float columnsSpacing = (float)Window.Width / OptionsState.GridColumns;
 
     for (int i = 0; i < OptionsState.GridRows; i++)
     {
@@ -91,7 +91,7 @@ public class GridDrawingScene : Scene
 
   public void UpdateCellSize()
   {
-    CellWidth  = (float)Window.Width / OptionsState.GridRows;
-    CellHeight = (float)Window.Height / OptionsState.GridColumns;
+    CellWidth  = (float)Window.Width / OptionsState.GridColumns;
+    CellHeight = (float)Window.Height / OptionsState.GridRows;
   }
 }

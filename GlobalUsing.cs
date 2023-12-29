@@ -9,6 +9,7 @@ global using static SDL2.SDL.SDL_WindowFlags;
 global using static SDL2.SDL.SDL_bool;
 global using static SDL2.SDL.SDL_WindowEventID;
 global using static SDL2.SDL.SDL_Keymod;
+global using static SDL2.SDL.SDL_BlendMode;
 
 global using System;
 global using System.Threading;

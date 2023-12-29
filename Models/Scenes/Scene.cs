@@ -13,6 +13,9 @@ public abstract class Scene : IDisposable
   protected readonly Dictionary<string, IntPtr>    Fonts;
   protected readonly Dictionary<string, SDL_Color> Colors;
 
+  protected readonly SceneElementManager ElementManager;
+
+  private readonly SceneElementManager.EventManager  EventManager;
   private readonly Dictionary<SDL_EventType, Action> _eventDict;
 
   public Scene(SceneInitObject init)
@@ -26,6 +29,9 @@ public abstract class Scene : IDisposable
     Renderer     = init.Renderer;
     Fonts        = init.Fonts;
     Colors       = init.Colors;
+
+    ElementManager = new SceneElementManager(Mouse);
+    EventManager   = ElementManager.GetEventManager();
 
     _eventDict = new()
     {
@@ -45,15 +51,31 @@ public abstract class Scene : IDisposable
       _eventDict[e.type]();
   }
 
-  public virtual void OnInit()             { }
-  public virtual void OnRender()           { }
-  public virtual void OnMouseDown()        { }
-  public virtual void OnMouseUp()          { }
-  public virtual void OnMouseMove()        { }
+  public virtual void OnRender()
+  {
+    EventManager.OnRender();
+  }
+
+  public virtual void OnMouseDown()
+  {
+    EventManager.OnMouseDown();
+  }
+
+  public virtual void OnMouseUp()
+  {
+    EventManager.OnMouseUp();
+  }
+
+  public virtual void OnMouseMove()
+  {
+    EventManager.OnMouseMove();
+  }
+
+
+  public virtual void OnWindowResize()     { }
   public virtual void OnKeyDown()          { }
   public virtual void OnKeyUp()            { }
   public virtual void OnToggleFullscreen() { }
-  public virtual void OnWindowResize()     { }
   public virtual void OnFocusLost()        { }
   public virtual void OnFocusGain()        { }
 

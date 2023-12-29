@@ -2,46 +2,36 @@ namespace GameOfLife.Models;
 
 class MenuScene : Scene
 {
-  public readonly UIElement CGOLText = new();
+  public Button PlayButton;
+  public Text   CGOLText;
 
   public MenuScene(SceneInitObject init) : base(init)
   {
-    CGOLText.Load(Fonts["main-lg"], "Game of Life");
-    ComputeRects();
-  }
+    CGOLText   = new Text(Renderer, Fonts["Main-lg"], "Game of life");
+    CGOLText.X = (Window.Width - CGOLText.Width) / 2;
+    CGOLText.Y = (Window.Height - CGOLText.Height) / 2;
 
-  public override void OnWindowResize()
-  {
-    ComputeRects();
-  }
+    PlayButton = new(Renderer);
+    PlayButton.LoadText(Fonts["Main-md"], "Start");
+    PlayButton.SetTextSize();
+    PlayButton.BackgroundColor.a =  0xAA;
+    PlayButton.Width             += 50;
+    PlayButton.AddEventListener(Element.Event.MOUSE_DOWN, () => { Game.SetNextScene<EditScene>(); });
+    PlayButton.AddEventListener(Element.Event.MOUSE_ENTER, () => { PlayButton.BackgroundColor.a = 0xFF; });
+    PlayButton.AddEventListener(Element.Event.MOUSE_LEAVE, () => { PlayButton.BackgroundColor.a = 0xAA; });
+    PlayButton.Y = CGOLText.Y + CGOLText.Height + 30;
+    PlayButton.X = (Window.Width - PlayButton.Width) / 2;
 
-  public override void OnToggleFullscreen()
-  {
-    ComputeRects();
-  }
-
-  public override void Dispose() { }
-
-  public override void OnRender()
-  {
-    CGOLText.Render();
+    ElementManager
+      .AddElement(PlayButton)
+      .AddElement(CGOLText);
   }
 
   public override void OnKeyDown()
   {
+    base.OnKeyDown();
+
     if (Keyboard.Key == SDLK_SPACE)
       Game.SetNextScene<EditScene>();
-  }
-
-  public override void OnMouseDown()
-  {
-    if (Mouse.Button == SDL_BUTTON_LEFT)
-      Game.SetNextScene<EditScene>();
-  }
-
-  public void ComputeRects()
-  {
-    CGOLText.X = (Window.Width - CGOLText.Width) / 2;
-    CGOLText.Y = (Window.Height - CGOLText.Height) / 2;
   }
 }

@@ -8,7 +8,7 @@ public class EndScreenScene : Scene
   public EndScreenScene(SceneInitObject init) : base(init)
   {
     IntPtr surf = TTF_RenderText_Blended(
-      Fonts["main-lg"],
+      Fonts["Main-lg"],
       "Game over",
       new SDL_Color { r = 0x00, g = 0x00, b = 0x00, a = 0xff }
     );

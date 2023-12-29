@@ -31,8 +31,8 @@ public class Game : IGame
     _state.Window.OriginalHeight = _state.Window.Height = height;
 
     _state.Options.ShouldDrawGrid = true;
-    _state.Options.GridColumns    = 64;
     _state.Options.GridRows       = 64;
+    _state.Options.GridColumns    = 64;
 
     InitColors();
 
@@ -42,7 +42,8 @@ public class Game : IGame
     IMG_Init(ImgInitFlags);
     TTF_Init();
 
-    SDL_GetDisplayMode(0, 0, out var displayMode);
+    _state.Screen.Index = 0;
+    SDL_GetDisplayMode(_state.Screen.Index, 0, out var displayMode);
     _state.Screen.Width       = displayMode.w;
     _state.Screen.Height      = displayMode.h;
     _state.Screen.RefreshRate = displayMode.refresh_rate;
@@ -53,7 +54,6 @@ public class Game : IGame
 
     InitWindow();
     _renderer          = new Renderer(_state.Window.WindowPtr);
-    UIElement.Renderer = _renderer.SDLRrenderer;
     InitFonts();
 
     SetNextScene<MenuScene>();
@@ -167,9 +167,9 @@ public class Game : IGame
 
   private void InitFonts()
   {
-    _fonts["main-lg"] = _renderer.LoadFont("Assets/Fonts/UbuntuMono-R.ttf", 36);
-    _fonts["main-md"] = _renderer.LoadFont("Assets/Fonts/UbuntuMono-R.ttf", 24);
-    _fonts["main-sm"] = _renderer.LoadFont("Assets/Fonts/UbuntuMono-R.ttf", 16);
+    _fonts["Main-lg"] = _renderer.LoadFont("Assets/Fonts/UbuntuMono-R.ttf", 36);
+    _fonts["Main-md"] = _renderer.LoadFont("Assets/Fonts/UbuntuMono-R.ttf", 24);
+    _fonts["Main-sm"] = _renderer.LoadFont("Assets/Fonts/UbuntuMono-R.ttf", 16);
   }
 
   private void HandleWindowEvent(SDL_Event e)

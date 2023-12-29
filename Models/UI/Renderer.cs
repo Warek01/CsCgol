@@ -11,6 +11,7 @@ public class Renderer : IDisposable
     SDLWindow        = window;
     SDLWindowSurface = SDL_GetWindowSurface(SDLWindow);
     SDLRrenderer     = SDL_CreateRenderer(window, screenIndex, SDL_RendererFlags.SDL_RENDERER_ACCELERATED);
+    SDL_SetRenderDrawBlendMode(SDLRrenderer, SDL_BLENDMODE_BLEND);
   }
 
   public void Clear()
@@ -168,11 +169,6 @@ public class Renderer : IDisposable
     TTF_CloseFont(font);
   }
 
-  public IntPtr RenderText(string text, IntPtr font, SDL_Color color)
-  {
-    return TTF_RenderText_Blended(font, text, color);
-  }
-
   public void Screenshot(string filename, int x, int y, int width, int height)
   {
     var rect       = new SDL_Rect { x = x, y = y, w = width, h = height };
@@ -196,5 +192,15 @@ public class Renderer : IDisposable
     string filename = Path.Combine(basePath, $"{DateTime.Now:HH:mm:ss_dd-MM-yyyy}.png");
 
     Screenshot(filename, x, y, width, height);
+  }
+
+  public IntPtr LoadTextSurface(IntPtr font, string text, SDL_Color color)
+  {
+    return TTF_RenderText_Blended(font, text, color);
+  }
+
+  public IntPtr LoadTextTexture(IntPtr font, string text, SDL_Color color)
+  {
+    return SDL_CreateTextureFromSurface(SDLRrenderer, LoadTextSurface(font, text, color));
   }
 }
