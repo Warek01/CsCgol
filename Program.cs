@@ -1,5 +1,5 @@
-﻿using SDLTest.Models;
+﻿using GameOfLife.Models;
 
-using IGame game = new GameOfLife(600, 600);
+using IGame game = new Game(600, 600);
 
 game.Start();

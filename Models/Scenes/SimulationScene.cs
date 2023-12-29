@@ -1,33 +1,55 @@
-namespace SDLTest.Models;
+namespace GameOfLife.Models;
 
-public partial class GameOfLife
+public partial class Game
 {
   public class SimulationScene : GridDrawingScene
   {
+    private int _gridFps;
+
     public static int GridFpsChangeFactor = 10;
     public static int GridLowestFps       = 1;
 
     public bool IsPaused;
-    public int  GridFps = 10;
-    public int  GridFramesToSkipUntilUpdate;
+
+    public int GridFps
+    {
+      get => _gridFps;
+      set
+      {
+        _gridFps                    = value;
+        GridFramesToSkipUntilUpdate = Running.Fps / value;
+      }
+    }
+
+    public int GridFramesToSkipUntilUpdate;
 
     public override void OnInit()
     {
-      Name = "Simulation";
-      UpdateGridFramesToSkipUntilUpdate();
+      Name    = "Simulation";
+      GridFps = 10;
     }
 
     public override void OnRender()
     {
       DrawGrid();
 
-      if (!IsPaused && Game._frameIndex % GridFramesToSkipUntilUpdate == 0)
+      if (!IsPaused && Running.FrameIndex % GridFramesToSkipUntilUpdate == 0)
       {
         bool updated = UpdateGrid();
 
         if (!updated)
           Game.SetNextScene<EndScreenScene>();
       }
+    }
+
+    public override void OnFocusLost()
+    {
+      IsPaused = true;
+    }
+
+    public override void OnFocusGain()
+    {
+      IsPaused = false;
     }
 
     public override void OnWindowResize()
@@ -60,8 +82,14 @@ public partial class GameOfLife
           IncreaseGridUpdateSpeed();
           break;
         case SDLK_g:
-          Game._shouldDrawGrid = !Game._shouldDrawGrid;
+          Options.ShouldDrawGrid = !Options.ShouldDrawGrid;
           break;
+        case SDLK_s:
+        {
+          if (!Keyboard.ShiftPressed) break;
+          Render.Screenshot(0, 0, Window.Width, Window.Height);
+          break;
+        }
       }
     }
 
@@ -74,8 +102,8 @@ public partial class GameOfLife
     {
       bool updated = false;
 
-      for (int row = 0; row < Game._gridRows; row++)
-      for (int col = 0; col < Game._gridColumns; col++)
+      for (int row = 0; row < Options.GridRows; row++)
+      for (int col = 0; col < Options.GridColumns; col++)
       {
         int count = CountNeighbors(row, col);
 
@@ -85,8 +113,8 @@ public partial class GameOfLife
           updated = true;
       }
 
-      for (int row = 0; row < Game._gridRows; row++)
-      for (int col = 0; col < Game._gridColumns; col++)
+      for (int row = 0; row < Options.GridRows; row++)
+      for (int col = 0; col < Options.GridColumns; col++)
       {
         cells[row][col]    = newCells[row][col];
         newCells[row][col] = false;
@@ -104,29 +132,29 @@ public partial class GameOfLife
       {
         if (cells[row - 1][column]) count++;
         if (column > 0 && cells[row - 1][column - 1]) count++;
-        if (column < Game._gridRows - 1 && cells[row - 1][column + 1]) count++;
+        if (column < Options.GridRows - 1 && cells[row - 1][column + 1]) count++;
       }
 
       // left and right cells
       if (column > 0 && cells[row][column - 1]) count++;
-      if (column < Game._gridColumns - 1 && cells[row][column + 1]) count++;
+      if (column < Options.GridColumns - 1 && cells[row][column + 1]) count++;
 
       // lower 3 cells
-      if (row < Game._gridRows - 1)
+      if (row < Options.GridRows - 1)
       {
         if (cells[row + 1][column]) count++;
         if (column > 0 && cells[row + 1][column - 1]) count++;
-        if (column < Game._gridColumns - 1 && cells[row + 1][column + 1]) count++;
+        if (column < Options.GridColumns - 1 && cells[row + 1][column + 1]) count++;
       }
 
       return count;
     }
 
-    public void UpdateGridFramesToSkipUntilUpdate()
-    {
-      Console.WriteLine($"Updated grid fps to {GridFps}");
-      GridFramesToSkipUntilUpdate = Game._fps / GridFps;
-    }
+    // public void UpdateGridFramesToSkipUntilUpdate()
+    // {
+    //   Console.WriteLine($"Grid FPS = {GridFps}");
+    //   GridFramesToSkipUntilUpdate = Running.Fps / GridFps;
+    // }
 
     public void DecreaseGridUpdateSpeed()
     {
@@ -137,21 +165,21 @@ public partial class GameOfLife
       else
         GridFps -= GridFpsChangeFactor;
 
-      UpdateGridFramesToSkipUntilUpdate();
+      // UpdateGridFramesToSkipUntilUpdate();
     }
 
     public void IncreaseGridUpdateSpeed()
     {
-      if (GridFps >= Game._fps) return;
+      if (GridFps >= Running.Fps) return;
 
       if (GridFps == GridLowestFps)
         GridFps = GridFpsChangeFactor;
-      else if (Game._fps - GridFps < GridFpsChangeFactor)
-        GridFps = Game._fps;
+      else if (Running.Fps - GridFps < GridFpsChangeFactor)
+        GridFps = Running.Fps;
       else
         GridFps += GridFpsChangeFactor;
 
-      UpdateGridFramesToSkipUntilUpdate();
+      // UpdateGridFramesToSkipUntilUpdate();
     }
   }
 }

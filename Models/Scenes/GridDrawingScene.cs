@@ -1,6 +1,6 @@
-namespace SDLTest.Models;
+namespace GameOfLife.Models;
 
-public partial class GameOfLife
+public partial class Game
 {
   public class GridDrawingScene : Scene
   {
@@ -14,12 +14,12 @@ public partial class GameOfLife
     {
       UpdateCellSize();
 
-      for (int row = 0; row < Game._gridRows; row++)
+      for (int row = 0; row < Options.GridRows; row++)
       {
         cells.Add(new List<bool>());
         newCells.Add(new List<bool>());
 
-        for (int col = 0; col < Game._gridColumns; col++)
+        for (int col = 0; col < Options.GridColumns; col++)
         {
           cells[row].Add(false);
           newCells[row].Add(false);
@@ -31,38 +31,37 @@ public partial class GameOfLife
     {
       DrawGridCells();
 
-      if (Game._shouldDrawGrid)
+      if (Options.ShouldDrawGrid)
         DrawGridGrid();
     }
 
     public void DrawGridGrid()
     {
-      SDL_Color c = SDLUtils.GetDrawColor(Game._renderer);
+      SDL_Color c = Render.GetDrawColor();
+      Render.SetDrawColor(Game.GridColor);
 
-      SDLUtils.SetDrawColor(Game._renderer, Game._gridColor);
+      float rowsSpacing    = (float)Window.Height / Options.GridColumns;
+      float columnsSpacing = (float)Window.Width / Options.GridRows;
 
-      float rowsSpacing    = (float)Window.Height / Game._gridColumns;
-      float columnsSpacing = (float)Window.Width / Game._gridRows;
-
-      for (int i = 0; i < Game._gridRows; i++)
+      for (int i = 0; i < Options.GridRows; i++)
       {
         float y = rowsSpacing * i;
-        SDL_RenderDrawLineF(Game._renderer, 0, y, Window.Width, y);
+        Render.DrawLine(0, y, Window.Width, y);
 
-        for (int j = 0; j < Game._gridColumns; j++)
+        for (int j = 0; j < Options.GridColumns; j++)
         {
           float x = columnsSpacing * j;
-          SDL_RenderDrawLineF(Game._renderer, x, 0, x, Window.Height);
+          Render.DrawLine(x, 0, x, Window.Height);
         }
       }
 
-      SDLUtils.SetDrawColor(Game._renderer, c);
+      Render.SetDrawColor(c);
     }
 
     public void DrawGridCells()
     {
-      SDL_Color initialColor = SDLUtils.GetDrawColor(Game._renderer);
-      SDLUtils.SetDrawColor(Game._renderer, Game._cellColor);
+      SDL_Color initialColor = Render.GetDrawColor();
+      Render.SetDrawColor(Game.CellColor);
 
       var cellRect = new SDL_FRect
       {
@@ -70,18 +69,18 @@ public partial class GameOfLife
         h = CellHeight
       };
 
-      for (int row = 0; row < Game._gridRows; row++)
-      for (int col = 0; col < Game._gridColumns; col++)
+      for (int row = 0; row < Options.GridRows; row++)
+      for (int col = 0; col < Options.GridColumns; col++)
       {
         if (!cells[row][col]) continue;
 
         cellRect.x = col * CellWidth;
         cellRect.y = row * CellHeight;
 
-        SDL_RenderFillRectF(Game._renderer, ref cellRect);
+        Render.FillRect(cellRect);
       }
 
-      SDLUtils.SetDrawColor(Game._renderer, initialColor);
+      Render.SetDrawColor(initialColor);
     }
 
     public void DisposeGrid()
@@ -92,8 +91,8 @@ public partial class GameOfLife
 
     public void UpdateCellSize()
     {
-      CellWidth  = (float)Window.Width / Game._gridRows;
-      CellHeight = (float)Window.Height / Game._gridColumns;
+      CellWidth  = (float)Window.Width / Options.GridRows;
+      CellHeight = (float)Window.Height / Options.GridColumns;
     }
   }
 }

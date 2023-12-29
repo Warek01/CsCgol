@@ -1,6 +1,6 @@
-namespace SDLTest.Models;
+namespace GameOfLife.Models;
 
-public partial class GameOfLife
+public partial class Game
 {
   class EditScene : GridDrawingScene
   {
@@ -23,7 +23,7 @@ public partial class GameOfLife
           Game.SetNextScene<SimulationScene>();
           break;
         case SDLK_g:
-          Game._shouldDrawGrid = !Game._shouldDrawGrid;
+          Options.ShouldDrawGrid = !Options.ShouldDrawGrid;
           break;
       }
     }

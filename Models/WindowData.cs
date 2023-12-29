@@ -1,4 +1,4 @@
-namespace SDLTest.Models;
+namespace GameOfLife.Models;
 
 public class WindowData
 {

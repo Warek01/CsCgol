@@ -1,23 +1,23 @@
-namespace SDLTest.Models;
+namespace GameOfLife.Models;
 
-public partial class GameOfLife
+public partial class Game
 {
   public class EndScreenScene : Scene
   {
-    public nint     Texture;
+    public IntPtr     Texture;
     public SDL_Rect Rect;
 
     public override void OnInit()
     {
       Name = "End screen";
 
-      nint surf = TTF_RenderText_Blended(
-        Game._fonts["main-lg"],
+      IntPtr surf = TTF_RenderText_Blended(
+        Game.Fonts["main-lg"],
         "Game over",
         new SDL_Color { r = 0x00, g = 0x00, b = 0x00, a = 0xff }
       );
 
-      Texture = SDL_CreateTextureFromSurface(Game._renderer, surf);
+      Texture = Render.CreateTexture(surf);
       SDL_QueryTexture(Texture, out uint _, out int _, out Rect.w, out Rect.h);
       Rect.x = (Window.Width - Rect.w) / 2;
       Rect.y = (Window.Height - Rect.h) / 2;
@@ -36,7 +36,7 @@ public partial class GameOfLife
 
     public override void OnRender()
     {
-      SDL_RenderCopy(Game._renderer, Texture, 0, ref Rect);
+      Render.DrawTexture(Texture, Rect);
     }
   }
 }
