@@ -24,15 +24,15 @@ public class Renderer : IDisposable
     SDL_RenderPresent(SDLRrenderer);
   }
 
-  public void SetDrawColor(SDL_Color color)
+  public void SetDrawColor(Color color)
   {
-    SDL_SetRenderDrawColor(SDLRrenderer, color.r, color.g, color.b, color.a);
+    SDL_SetRenderDrawColor(SDLRrenderer, color.R, color.G, color.B, color.A);
   }
 
-  public SDL_Color GetDrawColor()
+  public Color GetDrawColor()
   {
     SDL_GetRenderDrawColor(SDLRrenderer, out byte r, out byte g, out byte b, out byte a);
-    return new SDL_Color { r = r, g = g, b = b, a = a };
+    return new Color(r, g, b, a);
   }
 
   public void DrawRect(int x, int y, int width, int height)
@@ -194,13 +194,23 @@ public class Renderer : IDisposable
     Screenshot(filename, x, y, width, height);
   }
 
-  public IntPtr LoadTextSurface(IntPtr font, string text, SDL_Color color)
+  public IntPtr LoadTextSurface(IntPtr font, string text, Color color)
   {
-    return TTF_RenderText_Blended(font, text, color);
+    return TTF_RenderUNICODE_Blended(font, text, color.SDL_Color);
   }
 
-  public IntPtr LoadTextTexture(IntPtr font, string text, SDL_Color color)
+  public IntPtr LoadTextSurfaceWrapped(IntPtr font, string text, Color color, uint wrap)
+  {
+    return TTF_RenderUNICODE_Blended_Wrapped(font, text, color.SDL_Color, wrap);
+  }
+
+  public IntPtr LoadTextTexture(IntPtr font, string text, Color color)
   {
     return SDL_CreateTextureFromSurface(SDLRrenderer, LoadTextSurface(font, text, color));
+  }
+
+  public IntPtr LoadTextTextureWrapped(IntPtr font, string text, Color color, uint wrap)
+  {
+    return SDL_CreateTextureFromSurface(SDLRrenderer, LoadTextSurfaceWrapped(font, text, color, wrap));
   }
 }

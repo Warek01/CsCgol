@@ -14,12 +14,12 @@ public class GridDrawingScene : Scene
   {
     UpdateCellSize();
 
-    for (int row = 0; row < OptionsState.GridRows; row++)
+    for (int row = 0; row < Options.GridRows; row++)
     {
       Cells.Add(new List<bool>());
       NewCells.Add(new List<bool>());
 
-      for (int col = 0; col < OptionsState.GridColumns; col++)
+      for (int col = 0; col < Options.GridColumns; col++)
       {
         Cells[row].Add(false);
         NewCells[row].Add(false);
@@ -31,24 +31,24 @@ public class GridDrawingScene : Scene
   {
     DrawGridCells();
 
-    if (OptionsState.ShouldDrawGrid)
+    if (Options.ShouldDrawGrid)
       DrawGridGrid();
   }
 
   public void DrawGridGrid()
   {
-    SDL_Color c = Renderer.GetDrawColor();
+    Color c = Renderer.GetDrawColor();
     Renderer.SetDrawColor(Colors["Grid"]);
 
-    float rowsSpacing    = (float)Window.Height / OptionsState.GridRows;
-    float columnsSpacing = (float)Window.Width / OptionsState.GridColumns;
+    float rowsSpacing    = (float)Window.Height / Options.GridRows;
+    float columnsSpacing = (float)Window.Width / Options.GridColumns;
 
-    for (int i = 0; i < OptionsState.GridRows; i++)
+    for (int i = 0; i < Options.GridRows; i++)
     {
       float y = rowsSpacing * i;
       Renderer.DrawLine(0, y, Window.Width, y);
 
-      for (int j = 0; j < OptionsState.GridColumns; j++)
+      for (int j = 0; j < Options.GridColumns; j++)
       {
         float x = columnsSpacing * j;
         Renderer.DrawLine(x, 0, x, Window.Height);
@@ -60,7 +60,7 @@ public class GridDrawingScene : Scene
 
   public void DrawGridCells()
   {
-    SDL_Color initialColor = Renderer.GetDrawColor();
+    Color initialColor = Renderer.GetDrawColor();
     Renderer.SetDrawColor(Colors["Cell"]);
 
     var cellRect = new SDL_FRect
@@ -69,8 +69,8 @@ public class GridDrawingScene : Scene
       h = CellHeight
     };
 
-    for (int row = 0; row < OptionsState.GridRows; row++)
-    for (int col = 0; col < OptionsState.GridColumns; col++)
+    for (int row = 0; row < Options.GridRows; row++)
+    for (int col = 0; col < Options.GridColumns; col++)
     {
       if (!Cells[row][col]) continue;
 
@@ -91,7 +91,7 @@ public class GridDrawingScene : Scene
 
   public void UpdateCellSize()
   {
-    CellWidth  = (float)Window.Width / OptionsState.GridColumns;
-    CellHeight = (float)Window.Height / OptionsState.GridRows;
+    CellWidth  = (float)Window.Width / Options.GridColumns;
+    CellHeight = (float)Window.Height / Options.GridRows;
   }
 }

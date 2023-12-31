@@ -2,8 +2,8 @@ namespace GameOfLife.Models;
 
 public class Game : IGame
 {
-  private readonly Dictionary<string, IntPtr>    _fonts  = new();
-  private readonly Dictionary<string, SDL_Color> _colors = new();
+  private readonly Dictionary<string, IntPtr> _fonts  = new();
+  private readonly Dictionary<string, Color>  _colors = new();
 
   private uint          InitFlags    = SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_AUDIO;
   private IMG_InitFlags ImgInitFlags = IMG_INIT_JPG | IMG_INIT_PNG | IMG_INIT_TIF | IMG_INIT_WEBP;
@@ -11,8 +11,8 @@ public class Game : IGame
   private Scene? _scene;
   private Scene? _nextScene;
 
-  private readonly GameState _state;
-  private readonly Renderer  _renderer;
+  private GameState _state;
+  private Renderer  _renderer;
 
   public Game(int width, int height)
   {
@@ -52,8 +52,7 @@ public class Game : IGame
     _state.Runtime.FrameIndex = 0;
     _state.Runtime.IsRunning  = true;
 
-    InitWindow();
-    _renderer          = new Renderer(_state.Window.WindowPtr);
+    InitWindowAndRenderer();
     InitFonts();
 
     SetNextScene<MenuScene>();
@@ -150,10 +149,10 @@ public class Game : IGame
   {
     var init = new SceneInitObject
     {
-      Colors = _colors,
-      Fonts  = _fonts,
-      Game   = this,
-      State  = _state,
+      Colors   = _colors,
+      Fonts    = _fonts,
+      Game     = this,
+      State    = _state,
       Renderer = _renderer,
     };
 
@@ -236,7 +235,7 @@ public class Game : IGame
     _state.Mouse.Y = e.motion.y;
   }
 
-  private void InitWindow()
+  private void InitWindowAndRenderer()
   {
     IntPtr window = SDL_CreateWindow(
       _state.Window.Title,
@@ -246,6 +245,8 @@ public class Game : IGame
       _state.Window.Height,
       SDL_WINDOW_SHOWN
     );
+
+    _renderer = new Renderer(window);
 
     SDL_SetWindowMinimumSize(window, 400, 400);
     SDL_SetWindowMaximumSize(window, _state.Screen.Width, _state.Screen.Height);
@@ -288,12 +289,13 @@ public class Game : IGame
 
   private void InitColors()
   {
-    _colors["Grid"]       = new() { r = 0x22, g = 0x2f, b = 0x3e, a = 0xff };
-    _colors["Cell"]       = new() { r = 0x0a, g = 0xbd, b = 0xe3, a = 0xff };
-    _colors["Background"] = new() { r = 0x57, g = 0x65, b = 0x74, a = 0xff };
-    _colors["Black"]      = new() { r = 0x00, g = 0x00, b = 0x00, a = 0xff };
-    _colors["Red"]        = new() { r = 0xff, g = 0x00, b = 0x00, a = 0xff };
-    _colors["Green"]      = new() { r = 0xff, g = 0x00, b = 0x00, a = 0xff };
-    _colors["Blue"]       = new() { r = 0xff, g = 0x00, b = 0x00, a = 0xff };
+    _colors["Grid"]       = new Color("222F3E");
+    _colors["Cell"]       = new Color("0ABDE3");
+    _colors["Background"] = new Color("576574");
+    _colors["Black"]      = new Color("000000");
+    _colors["Red"]        = new Color("FF0000");
+    _colors["Green"]      = new Color("00FF00");
+    _colors["Blue"]       = new Color("0000FF");
+    _colors["Button"]     = new Color("EE5253");
   }
 }

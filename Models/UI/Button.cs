@@ -2,9 +2,8 @@ namespace GameOfLife.Models;
 
 public class Button : Element
 {
-
-  public SDL_Color BackgroundColor = new SDL_Color { r = 0xAF, g = 0x00, b = 0x00, a = 0x00 };
-  public SDL_Color TextColor       = new SDL_Color { r = 0x00, g = 0x00, b = 000, a  = 0xFF };
+  public Color BackgroundColor = new Color("000000");
+  public Color TextColor       = new Color("000000");
 
   protected SDL_Rect BackgroundRect = new SDL_Rect { x = 0, y = 0, w = 0, h = 0 };
   protected SDL_Rect TextRect       = new SDL_Rect { x = 0, y = 0, w = 0, h = 0 };
@@ -12,7 +11,10 @@ public class Button : Element
   protected IntPtr   TextTexture;
 
 
-  public Button(Renderer renderer) : base(renderer) { }
+  public Button(Renderer renderer, IntPtr font, string text) : base(renderer)
+  {
+    LoadText(font, text);
+  }
 
   public void LoadBackground(string path)
   {
@@ -28,7 +30,7 @@ public class Button : Element
 
   public override void Render()
   {
-    SDL_Color initialColor = Renderer.GetDrawColor();
+    Color initialColor = Renderer.GetDrawColor();
     Renderer.SetDrawColor(BackgroundColor);
     Renderer.FillRect(Rect);
     Renderer.DrawTexture(BackgroundTexture, Rect);
@@ -36,21 +38,21 @@ public class Button : Element
     Renderer.SetDrawColor(initialColor);
   }
 
-  public void SetAutoSize()
+  public void AdjustSizeAuto()
   {
     Rect.w = Math.Max(BackgroundRect.w, TextRect.w);
     Rect.h = Math.Max(BackgroundRect.h, TextRect.w);
     OnRectUpdate();
   }
 
-  public void SetTextSize()
+  public void AdjustSizeToText()
   {
     Rect.w = TextRect.w;
-    Rect.h = TextRect.w;
+    Rect.h = TextRect.h;
     OnRectUpdate();
   }
 
-  public void SetBackgroundTextureSize()
+  public void AdjustSizeToBackground()
   {
     Rect.w = BackgroundRect.w;
     Rect.h = BackgroundRect.h;

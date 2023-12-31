@@ -6,12 +6,12 @@ public abstract class Scene : IDisposable
   protected readonly MouseState   Mouse;
   protected readonly WindowState  Window;
   protected readonly Renderer     Renderer;
-  protected readonly OptionsState OptionsState;
+  protected readonly OptionsState Options;
   protected readonly RuntimeState Runtime;
   protected readonly IGame        Game;
 
-  protected readonly Dictionary<string, IntPtr>    Fonts;
-  protected readonly Dictionary<string, SDL_Color> Colors;
+  protected readonly Dictionary<string, IntPtr> Fonts;
+  protected readonly Dictionary<string, Color>  Colors;
 
   protected readonly SceneElementManager ElementManager;
 
@@ -20,15 +20,15 @@ public abstract class Scene : IDisposable
 
   public Scene(SceneInitObject init)
   {
-    Game         = init.Game;
-    Keyboard     = init.State.Keyboard;
-    Mouse        = init.State.Mouse;
-    Window       = init.State.Window;
-    OptionsState = init.State.Options;
-    Runtime      = init.State.Runtime;
-    Renderer     = init.Renderer;
-    Fonts        = init.Fonts;
-    Colors       = init.Colors;
+    Game     = init.Game;
+    Keyboard = init.State.Keyboard;
+    Mouse    = init.State.Mouse;
+    Window   = init.State.Window;
+    Options  = init.State.Options;
+    Runtime  = init.State.Runtime;
+    Renderer = init.Renderer;
+    Fonts    = init.Fonts;
+    Colors   = init.Colors;
 
     ElementManager = new SceneElementManager(Mouse);
     EventManager   = ElementManager.GetEventManager();

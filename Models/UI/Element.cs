@@ -9,6 +9,8 @@ public abstract class Element : IDisposable
     MOUSE_ENTER,
     MOUSE_LEAVE,
     MOUSE_MOVE,
+
+    CHECKBOX_CHANGE,
   }
 
   public Renderer Renderer;
@@ -66,7 +68,7 @@ public abstract class Element : IDisposable
 
   public abstract void Dispose();
 
-  public void OnEvent(Event e)
+  public void CallEvent(Event e)
   {
     if (_eventsDict.ContainsKey(e))
       foreach (Action callback in _eventsDict[e])

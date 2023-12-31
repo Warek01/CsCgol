@@ -20,7 +20,7 @@ class EditScene : GridDrawingScene
         Game.SetNextScene<SimulationScene>();
         break;
       case SDLK_g:
-        OptionsState.ShouldDrawGrid = !OptionsState.ShouldDrawGrid;
+        Options.ShouldDrawGrid = !Options.ShouldDrawGrid;
         break;
     }
   }

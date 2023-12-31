@@ -79,7 +79,7 @@ public class SimulationScene : GridDrawingScene
         IncreaseGridUpdateSpeed();
         break;
       case SDLK_g:
-        OptionsState.ShouldDrawGrid = !OptionsState.ShouldDrawGrid;
+        Options.ShouldDrawGrid = !Options.ShouldDrawGrid;
         break;
       case SDLK_s:
       {
@@ -99,8 +99,8 @@ public class SimulationScene : GridDrawingScene
   {
     bool updated = false;
 
-    for (int row = 0; row < OptionsState.GridRows; row++)
-    for (int col = 0; col < OptionsState.GridColumns; col++)
+    for (int row = 0; row < Options.GridRows; row++)
+    for (int col = 0; col < Options.GridColumns; col++)
     {
       int count = CountNeighbors(row, col);
 
@@ -110,8 +110,8 @@ public class SimulationScene : GridDrawingScene
         updated = true;
     }
 
-    for (int row = 0; row < OptionsState.GridRows; row++)
-    for (int col = 0; col < OptionsState.GridColumns; col++)
+    for (int row = 0; row < Options.GridRows; row++)
+    for (int col = 0; col < Options.GridColumns; col++)
     {
       Cells[row][col]    = NewCells[row][col];
       NewCells[row][col] = false;
@@ -129,19 +129,19 @@ public class SimulationScene : GridDrawingScene
     {
       if (Cells[row - 1][column]) count++;
       if (column > 0 && Cells[row - 1][column - 1]) count++;
-      if (column < OptionsState.GridRows - 1 && Cells[row - 1][column + 1]) count++;
+      if (column < Options.GridRows - 1 && Cells[row - 1][column + 1]) count++;
     }
 
     // left and right cells
     if (column > 0 && Cells[row][column - 1]) count++;
-    if (column < OptionsState.GridColumns - 1 && Cells[row][column + 1]) count++;
+    if (column < Options.GridColumns - 1 && Cells[row][column + 1]) count++;
 
     // lower 3 cells
-    if (row < OptionsState.GridRows - 1)
+    if (row < Options.GridRows - 1)
     {
       if (Cells[row + 1][column]) count++;
       if (column > 0 && Cells[row + 1][column - 1]) count++;
-      if (column < OptionsState.GridColumns - 1 && Cells[row + 1][column + 1]) count++;
+      if (column < Options.GridColumns - 1 && Cells[row + 1][column + 1]) count++;
     }
 
     return count;
