@@ -29,10 +29,10 @@ public class Checkbox : Element
 
     CheckboxTexture = Renderer.LoadTexture("Assets/Images/Checkbox.png");
 
-    AddEventListener(Event.MOUSE_DOWN, () =>
+    AddEventListener(UiEvent.MOUSE_DOWN, () =>
     {
       IsChecked = !IsChecked;
-      CallEvent(Event.CHECKBOX_CHANGE);
+      InvokeEvent(UiEvent.CHANGE);
     });
   }
 

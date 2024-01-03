@@ -1,18 +1,17 @@
 namespace GameOfLife.Models;
 
+public enum UiEvent
+{
+  MOUSE_DOWN,
+  MOUSE_UP,
+  MOUSE_ENTER,
+  MOUSE_LEAVE,
+  MOUSE_MOVE,
+  CHANGE,
+}
+
 public abstract class Element : IDisposable
 {
-  public enum Event
-  {
-    MOUSE_DOWN,
-    MOUSE_UP,
-    MOUSE_ENTER,
-    MOUSE_LEAVE,
-    MOUSE_MOVE,
-
-    CHECKBOX_CHANGE,
-  }
-
   public Renderer Renderer;
 
   public int X
@@ -57,7 +56,7 @@ public abstract class Element : IDisposable
 
   protected SDL_Rect Rect;
 
-  private readonly Dictionary<Event, List<Action>> _eventsDict = new();
+  private readonly Dictionary<UiEvent, List<Action>> _eventsDict = new();
 
   public Element(Renderer renderer)
   {
@@ -68,14 +67,15 @@ public abstract class Element : IDisposable
 
   public abstract void Dispose();
 
-  public void CallEvent(Event e)
+  public void InvokeEvent(UiEvent e)
   {
-    if (_eventsDict.ContainsKey(e))
-      foreach (Action callback in _eventsDict[e])
-        callback();
+    if (!_eventsDict.ContainsKey(e)) return;
+
+    foreach (Action callback in _eventsDict[e])
+      callback();
   }
 
-  public void AddEventListener(Event e, Action listener)
+  public void AddEventListener(UiEvent e, Action listener)
   {
     if (!_eventsDict.ContainsKey(e))
       _eventsDict[e] = new List<Action>();
@@ -83,7 +83,7 @@ public abstract class Element : IDisposable
     _eventsDict[e].Add(listener);
   }
 
-  public void RemoveEventListener(Event e, Action listener)
+  public void RemoveEventListener(UiEvent e, Action listener)
   {
     if (!_eventsDict.ContainsKey(e))
       return;
@@ -91,7 +91,7 @@ public abstract class Element : IDisposable
     _eventsDict[e].Remove(listener);
   }
 
-  public void RemoveAllListeners(Event e)
+  public void RemoveAllListeners(UiEvent e)
   {
     if (!_eventsDict.ContainsKey(e))
       return;

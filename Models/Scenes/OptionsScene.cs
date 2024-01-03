@@ -17,7 +17,7 @@ class OptionsScene : Scene
       BackgroundColor = Colors["Button"]
     };
 
-    BackButton.AddEventListener(Element.Event.MOUSE_DOWN, () => { Game.SetNextScene<MenuScene>(); });
+    BackButton.AddEventListener(UiEvent.MOUSE_DOWN, () => Game.SetNextScene<MenuScene>());
 
     DrawGridCheckbox = new Checkbox(Renderer, Fonts["Main-md"], "Draw grid")
     {
@@ -26,10 +26,7 @@ class OptionsScene : Scene
       IsChecked = Options.ShouldDrawGrid,
     };
 
-    DrawGridCheckbox.AddEventListener(
-      Element.Event.CHECKBOX_CHANGE,
-      () => Options.ShouldDrawGrid = DrawGridCheckbox.IsChecked
-    );
+    DrawGridCheckbox.AddEventListener(UiEvent.CHANGE, () => Options.ShouldDrawGrid = DrawGridCheckbox.IsChecked);
 
     InfoText = new Text(
       Renderer,
@@ -38,8 +35,8 @@ class OptionsScene : Scene
       (uint)Window.Width - 60
     )
     {
-      X         = 30,
-      Y         = DrawGridCheckbox.Y + DrawGridCheckbox.Height + 30,
+      X = 30,
+      Y = DrawGridCheckbox.Y + DrawGridCheckbox.Height + 30,
     };
 
     ElementManager

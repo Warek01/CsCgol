@@ -289,13 +289,13 @@ public class Game : IGame
 
   private void InitColors()
   {
-    _colors["Grid"]       = new Color("222F3E");
-    _colors["Cell"]       = new Color("0ABDE3");
-    _colors["Background"] = new Color("576574");
-    _colors["Black"]      = new Color("000000");
-    _colors["Red"]        = new Color("FF0000");
-    _colors["Green"]      = new Color("00FF00");
-    _colors["Blue"]       = new Color("0000FF");
-    _colors["Button"]     = new Color("EE5253");
+    _colors["Grid"]       = new Color(0x222F3EFF);
+    _colors["Cell"]       = new Color(0x0ABDE3FF);
+    _colors["Background"] = new Color(0x576574FF);
+    _colors["Black"]      = new Color(0x000000FF);
+    _colors["Red"]        = new Color(0xFF0000FF);
+    _colors["Green"]      = new Color(0x00FF00FF);
+    _colors["Blue"]       = new Color(0x0000FFFF);
+    _colors["Button"]     = new Color(0xEE5253FF);
   }
 }

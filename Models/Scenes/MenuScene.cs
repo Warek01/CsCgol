@@ -16,9 +16,9 @@ class MenuScene : Scene
       Width           = 120,
       Height          = 50,
     };
-    PlayButton.AddEventListener(Element.Event.MOUSE_DOWN, () => { Game.SetNextScene<EditScene>(); });
-    PlayButton.AddEventListener(Element.Event.MOUSE_ENTER, () => { PlayButton.BackgroundColor.Lighten(0xF); });
-    PlayButton.AddEventListener(Element.Event.MOUSE_LEAVE, () => { PlayButton.BackgroundColor.Darken(0xF); });
+    PlayButton.AddEventListener(UiEvent.MOUSE_DOWN, () => Game.SetNextScene<EditScene>());
+    PlayButton.AddEventListener(UiEvent.MOUSE_ENTER, () => PlayButton.BackgroundColor += 0xF);
+    PlayButton.AddEventListener(UiEvent.MOUSE_LEAVE, () => PlayButton.BackgroundColor -= 0xF);
 
     OptionsButton = new Button(Renderer, Fonts["Main-md"], "Options")
     {
@@ -26,9 +26,9 @@ class MenuScene : Scene
       Width           = PlayButton.Width,
       Height          = PlayButton.Height,
     };
-    OptionsButton.AddEventListener(Element.Event.MOUSE_DOWN, () => { Game.SetNextScene<OptionsScene>(); });
-    OptionsButton.AddEventListener(Element.Event.MOUSE_ENTER, () => { OptionsButton.BackgroundColor.Lighten(0xF); });
-    OptionsButton.AddEventListener(Element.Event.MOUSE_LEAVE, () => { OptionsButton.BackgroundColor.Darken(0xF); });
+    OptionsButton.AddEventListener(UiEvent.MOUSE_DOWN, () => Game.SetNextScene<OptionsScene>());
+    OptionsButton.AddEventListener(UiEvent.MOUSE_ENTER, () => OptionsButton.BackgroundColor += 0xF);
+    OptionsButton.AddEventListener(UiEvent.MOUSE_LEAVE, () => OptionsButton.BackgroundColor -= 0xF);
 
 
     ElementManager

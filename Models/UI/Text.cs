@@ -14,7 +14,7 @@ public class Text : Element
     }
   }
 
-  public Color Color { get; private set; } = new Color("000000");
+  public Color Color { get; private set; } = new Color(0x000000FF);
 
   protected IntPtr Texture = IntPtr.Zero;
   protected IntPtr Font    = IntPtr.Zero;

@@ -27,13 +27,13 @@ public class SceneElementManager
     public void OnMouseDown()
     {
       if (_isDisabled) return;
-      FindElementOnCoordinates(_mouse.X, _mouse.Y)?.CallEvent(Element.Event.MOUSE_DOWN);
+      FindElementOnCoordinates(_mouse.X, _mouse.Y)?.InvokeEvent(UiEvent.MOUSE_DOWN);
     }
 
     public void OnMouseUp()
     {
       if (_isDisabled) return;
-      FindElementOnCoordinates(_mouse.X, _mouse.Y)?.CallEvent(Element.Event.MOUSE_UP);
+      FindElementOnCoordinates(_mouse.X, _mouse.Y)?.InvokeEvent(UiEvent.MOUSE_UP);
     }
 
     public void OnMouseMove()
@@ -44,12 +44,12 @@ public class SceneElementManager
 
       if (element != _hoveredElement)
       {
-        _hoveredElement?.CallEvent(Element.Event.MOUSE_LEAVE);
-        element?.CallEvent(Element.Event.MOUSE_ENTER);
+        _hoveredElement?.InvokeEvent(UiEvent.MOUSE_LEAVE);
+        element?.InvokeEvent(UiEvent.MOUSE_ENTER);
         _hoveredElement = element;
       }
 
-      element?.CallEvent(Element.Event.MOUSE_MOVE);
+      element?.InvokeEvent(UiEvent.MOUSE_MOVE);
     }
 
     public Element? FindElementOnCoordinates(int x, int y)

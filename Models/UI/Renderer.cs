@@ -196,12 +196,12 @@ public class Renderer : IDisposable
 
   public IntPtr LoadTextSurface(IntPtr font, string text, Color color)
   {
-    return TTF_RenderUNICODE_Blended(font, text, color.SDL_Color);
+    return TTF_RenderUNICODE_Blended(font, text, color.SDL_Color());
   }
 
   public IntPtr LoadTextSurfaceWrapped(IntPtr font, string text, Color color, uint wrap)
   {
-    return TTF_RenderUNICODE_Blended_Wrapped(font, text, color.SDL_Color, wrap);
+    return TTF_RenderUNICODE_Blended_Wrapped(font, text, color.SDL_Color(), wrap);
   }
 
   public IntPtr LoadTextTexture(IntPtr font, string text, Color color)

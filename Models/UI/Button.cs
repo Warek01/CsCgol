@@ -2,14 +2,13 @@ namespace GameOfLife.Models;
 
 public class Button : Element
 {
-  public Color BackgroundColor = new Color("000000");
-  public Color TextColor       = new Color("000000");
+  public Color BackgroundColor = new Color(0x000000FF);
+  public Color TextColor       = new Color(0x000000FF);
 
   protected SDL_Rect BackgroundRect = new SDL_Rect { x = 0, y = 0, w = 0, h = 0 };
   protected SDL_Rect TextRect       = new SDL_Rect { x = 0, y = 0, w = 0, h = 0 };
   protected IntPtr   BackgroundTexture;
   protected IntPtr   TextTexture;
-
 
   public Button(Renderer renderer, IntPtr font, string text) : base(renderer)
   {
