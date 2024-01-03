@@ -1,6 +1,6 @@
-namespace GameOfLife.Models;
+namespace CsGame.Models;
 
-// Manages all elements shown in the scene. Renders the elements, computes mouse events.
+// Manages all UI elements shown in the scene. Renders the elements, computes mouse events.
 public class SceneElementManager
 {
   public class EventManager

@@ -1,4 +1,4 @@
-﻿using GameOfLife.Models;
+﻿using CsGame.Models;
 
 using IGame game = new Game(600, 600);
 

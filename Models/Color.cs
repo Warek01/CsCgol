@@ -1,4 +1,4 @@
-namespace GameOfLife.Models;
+namespace CsGame.Models;
 
 public struct Color : IEquatable<Color>
 {
@@ -46,6 +46,7 @@ public struct Color : IEquatable<Color>
     c.Lighten(value);
     return c;
   }
+
   public static Color operator -(Color color, byte value)
   {
     var c = new Color(color._packedValue);
@@ -108,4 +109,45 @@ public struct Color : IEquatable<Color>
   {
     _packedValue = 0U | (uint)R << 24 | (uint)G << 16 | (uint)B << 8 | A;
   }
+
+  #region Predefined colors
+
+  public static readonly Color Black;
+  public static readonly Color Red;
+  public static readonly Color Green;
+  public static readonly Color Blue;
+  public static readonly Color White;
+  public static readonly Color Yellow;
+  public static readonly Color Silver;
+  public static readonly Color Gray;
+  public static readonly Color Maroon;
+  public static readonly Color Olive;
+  public static readonly Color Lime;
+  public static readonly Color Aqua;
+  public static readonly Color Teal;
+  public static readonly Color Navy;
+  public static readonly Color Fuchsia;
+  public static readonly Color Purple;
+
+  static Color()
+  {
+    Black   = new Color(0x000000FF);
+    Red     = new Color(0xFF0000FF);
+    Green   = new Color(0x008000FF);
+    Blue    = new Color(0x0000FFFF);
+    White   = new Color(0xFFFFFFFF);
+    Yellow  = new Color(0xFFFF00FF);
+    Silver  = new Color(0xC0C0C0FF);
+    Gray    = new Color(0x808080FF);
+    Maroon  = new Color(0x800000FF);
+    Olive   = new Color(0x808000FF);
+    Lime    = new Color(0x00FF00FF);
+    Aqua    = new Color(0x00FFFFFF);
+    Teal    = new Color(0x008080FF);
+    Navy    = new Color(0x000080FF);
+    Fuchsia = new Color(0xFF00FFFF);
+    Purple  = new Color(0x800080FF);
+  }
+
+  #endregion
 }

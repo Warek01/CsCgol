@@ -1,4 +1,4 @@
-namespace GameOfLife.Models;
+namespace CsGame.Models;
 
 // Current screen (monitor)
 public class ScreenState

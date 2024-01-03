@@ -1,4 +1,4 @@
-namespace GameOfLife.Models;
+namespace CsGame.Models;
 
 public enum UiEvent
 {

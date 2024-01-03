@@ -1,4 +1,4 @@
-namespace GameOfLife.Models;
+namespace CsGame.Models;
 
 // Contains all states
 public class GameState

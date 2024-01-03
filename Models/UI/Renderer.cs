@@ -1,4 +1,4 @@
-namespace GameOfLife.Models;
+namespace CsGame.Models;
 
 public class Renderer : IDisposable
 {
@@ -157,16 +157,6 @@ public class Renderer : IDisposable
   public void DestroySurface(IntPtr surface)
   {
     SDL_FreeSurface(surface);
-  }
-
-  public IntPtr LoadFont(string path, int size)
-  {
-    return TTF_OpenFont(path, size);
-  }
-
-  public void DestroyFont(IntPtr font)
-  {
-    TTF_CloseFont(font);
   }
 
   public void Screenshot(string filename, int x, int y, int width, int height)

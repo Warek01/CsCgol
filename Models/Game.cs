@@ -1,10 +1,7 @@
-namespace GameOfLife.Models;
+namespace CsGame.Models;
 
 public class Game : IGame
 {
-  private readonly Dictionary<string, IntPtr> _fonts  = new();
-  private readonly Dictionary<string, Color>  _colors = new();
-
   private uint          InitFlags    = SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_AUDIO;
   private IMG_InitFlags ImgInitFlags = IMG_INIT_JPG | IMG_INIT_PNG | IMG_INIT_TIF | IMG_INIT_WEBP;
 
@@ -13,6 +10,7 @@ public class Game : IGame
 
   private GameState _state;
   private Renderer  _renderer;
+  private Font      _mainFont;
 
   public Game(int width, int height)
   {
@@ -26,21 +24,13 @@ public class Game : IGame
       Runtime  = new RuntimeState(),
     };
 
-    _state.Window.Title          = "Game of Life";
+    _state.Window.Title          = "GAME NAME";
     _state.Window.OriginalWidth  = _state.Window.Width  = width;
     _state.Window.OriginalHeight = _state.Window.Height = height;
 
-    _state.Options.ShouldDrawGrid = true;
-    _state.Options.GridRows       = 64;
-    _state.Options.GridColumns    = 64;
-
-    InitColors();
-
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "best");
-
     SDL_Init(InitFlags);
     IMG_Init(ImgInitFlags);
-    TTF_Init();
 
     _state.Screen.Index = 0;
     SDL_GetDisplayMode(_state.Screen.Index, 0, out var displayMode);
@@ -53,7 +43,8 @@ public class Game : IGame
     _state.Runtime.IsRunning  = true;
 
     InitWindowAndRenderer();
-    InitFonts();
+
+    _mainFont = new Font("UbuntuMono-R.ttf");
 
     SetNextScene<MenuScene>();
   }
@@ -78,7 +69,7 @@ public class Game : IGame
         _scene?.HandleEvent(e);
       }
 
-      _renderer.SetDrawColor(_colors["Background"]);
+      _renderer.SetDrawColor(Color.Maroon);
       _renderer.Clear();
       _scene?.OnRender();
       _renderer.Present();
@@ -97,9 +88,6 @@ public class Game : IGame
   {
     _scene?.Dispose();
     _nextScene?.Dispose();
-
-    foreach (var pair in _fonts)
-      _renderer.DestroyFont(pair.Value);
 
     _renderer.Dispose();
 
@@ -149,9 +137,8 @@ public class Game : IGame
   {
     var init = new SceneInitObject
     {
-      Colors   = _colors,
-      Fonts    = _fonts,
       Game     = this,
+      MainFont = _mainFont,
       State    = _state,
       Renderer = _renderer,
     };
@@ -162,13 +149,6 @@ public class Game : IGame
       throw new Exception("Error instantiating scene");
 
     return (Scene)instance;
-  }
-
-  private void InitFonts()
-  {
-    _fonts["Main-lg"] = _renderer.LoadFont("Assets/Fonts/UbuntuMono-R.ttf", 36);
-    _fonts["Main-md"] = _renderer.LoadFont("Assets/Fonts/UbuntuMono-R.ttf", 24);
-    _fonts["Main-sm"] = _renderer.LoadFont("Assets/Fonts/UbuntuMono-R.ttf", 16);
   }
 
   private void HandleWindowEvent(SDL_Event e)
@@ -188,10 +168,10 @@ public class Game : IGame
 
   private void HandleMouseEvent(SDL_Event e)
   {
-    _state.Mouse.X             = e.button.x;
-    _state.Mouse.Y             = e.button.y;
-    _state.Mouse.Button        = e.button.button;
-    _state.Mouse.ButtonPressed = e.type == SDL_MOUSEBUTTONDOWN;
+    _state.Mouse.X               = e.button.x;
+    _state.Mouse.Y               = e.button.y;
+    _state.Mouse.Button          = e.button.button;
+    _state.Mouse.IsButtonPressed = e.type == SDL_MOUSEBUTTONDOWN;
   }
 
   private void HandleKeyDown(SDL_Event e)
@@ -205,9 +185,6 @@ public class Game : IGame
         break;
       case SDLK_f:
         ToggleFullscreen();
-        break;
-      case SDLK_r:
-        SetNextScene<MenuScene>();
         break;
     }
   }
@@ -285,17 +262,5 @@ public class Game : IGame
     _state.Window.IsFullscreen = !_state.Window.IsFullscreen;
 
     _scene?.OnToggleFullscreen();
-  }
-
-  private void InitColors()
-  {
-    _colors["Grid"]       = new Color(0x222F3EFF);
-    _colors["Cell"]       = new Color(0x0ABDE3FF);
-    _colors["Background"] = new Color(0x576574FF);
-    _colors["Black"]      = new Color(0x000000FF);
-    _colors["Red"]        = new Color(0xFF0000FF);
-    _colors["Green"]      = new Color(0x00FF00FF);
-    _colors["Blue"]       = new Color(0x0000FFFF);
-    _colors["Button"]     = new Color(0xEE5253FF);
   }
 }

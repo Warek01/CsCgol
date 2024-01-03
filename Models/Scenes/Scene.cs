@@ -1,5 +1,6 @@
-namespace GameOfLife.Models;
+namespace CsGame.Models;
 
+// Abstract scene representing a particular global game state like menu, ingame etc.
 public abstract class Scene : IDisposable
 {
   protected readonly KeyState     Keyboard;
@@ -9,31 +10,22 @@ public abstract class Scene : IDisposable
   protected readonly OptionsState Options;
   protected readonly RuntimeState Runtime;
   protected readonly IGame        Game;
-
-  protected readonly Dictionary<string, IntPtr> Fonts;
-  protected readonly Dictionary<string, Color>  Colors;
+  protected readonly Font         MainFont;
+  protected readonly ScreenState  Screen;
 
   protected readonly SceneElementManager ElementManager;
 
-  private readonly SceneElementManager.EventManager  EventManager;
+  private readonly SceneElementManager.EventManager  _eventManager;
   private readonly Dictionary<SDL_EventType, Action> _eventDict;
 
   public Scene(SceneInitObject init)
   {
-    Game     = init.Game;
-    Keyboard = init.State.Keyboard;
-    Mouse    = init.State.Mouse;
-    Window   = init.State.Window;
-    Options  = init.State.Options;
-    Runtime  = init.State.Runtime;
-    Renderer = init.Renderer;
-    Fonts    = init.Fonts;
-    Colors   = init.Colors;
+    (Game, Window, Mouse, Keyboard, Runtime, Options, Screen, Renderer, MainFont) = init;
 
     ElementManager = new SceneElementManager(Mouse);
-    EventManager   = ElementManager.GetEventManager();
+    _eventManager   = ElementManager.GetEventManager();
 
-    _eventDict = new()
+    _eventDict = new Dictionary<SDL_EventType, Action>
     {
       [SDL_KEYDOWN]         = OnKeyDown,
       [SDL_KEYUP]           = OnKeyUp,
@@ -47,28 +39,28 @@ public abstract class Scene : IDisposable
   {
     if (e.type == SDL_WINDOWEVENT)
       HandleWindowEvent(e);
-    else if (_eventDict.ContainsKey(e.type))
-      _eventDict[e.type]();
+    else if (_eventDict.TryGetValue(e.type, out Action value))
+            value.Invoke();
   }
 
   public virtual void OnRender()
   {
-    EventManager.OnRender();
+    _eventManager.OnRender();
   }
 
   public virtual void OnMouseDown()
   {
-    EventManager.OnMouseDown();
+    _eventManager.OnMouseDown();
   }
 
   public virtual void OnMouseUp()
   {
-    EventManager.OnMouseUp();
+    _eventManager.OnMouseUp();
   }
 
   public virtual void OnMouseMove()
   {
-    EventManager.OnMouseMove();
+    _eventManager.OnMouseMove();
   }
 
 
