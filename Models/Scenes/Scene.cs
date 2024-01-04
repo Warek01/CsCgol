@@ -9,7 +9,7 @@ public abstract class Scene : IDisposable
   protected readonly Renderer     Renderer;
   protected readonly OptionsState Options;
   protected readonly RuntimeState Runtime;
-  protected readonly IGame        Game;
+  protected readonly Game         Game;
   protected readonly Font         MainFont;
   protected readonly ScreenState  Screen;
 
@@ -23,7 +23,7 @@ public abstract class Scene : IDisposable
     (Game, Window, Mouse, Keyboard, Runtime, Options, Screen, Renderer, MainFont) = init;
 
     ElementManager = new SceneElementManager(Mouse);
-    _eventManager   = ElementManager.GetEventManager();
+    _eventManager  = ElementManager.GetEventManager();
 
     _eventDict = new Dictionary<SDL_EventType, Action>
     {
@@ -40,7 +40,7 @@ public abstract class Scene : IDisposable
     if (e.type == SDL_WINDOWEVENT)
       HandleWindowEvent(e);
     else if (_eventDict.TryGetValue(e.type, out Action value))
-            value.Invoke();
+      value.Invoke();
   }
 
   public virtual void OnRender()

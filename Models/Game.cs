@@ -1,6 +1,6 @@
 namespace CsGame.Models;
 
-public class Game : IGame
+public class Game : IDisposable
 {
   private uint          InitFlags    = SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_AUDIO;
   private IMG_InitFlags ImgInitFlags = IMG_INIT_JPG | IMG_INIT_PNG | IMG_INIT_TIF | IMG_INIT_WEBP;

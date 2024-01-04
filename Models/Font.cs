@@ -9,12 +9,14 @@ public class Font : IDisposable
 
   public Font(string file)
   {
-    if (TTF_Init() != 0)
+    if (TTF_WasInit() == 0 && TTF_Init() != 0)
       throw new Exception($"Error initializing TTF: {TTF_GetError()}");
 
-    MainLg = TTF_OpenFont($"Assets/Fonts/{file}", 36);
-    MainMd = TTF_OpenFont($"Assets/Fonts/{file}", 24);
-    MainSm = TTF_OpenFont($"Assets/Fonts/{file}", 16);
+    string path = Path.Join("Assets", "Fonts", file);
+
+    MainLg = TTF_OpenFont(path, 36);
+    MainMd = TTF_OpenFont(path, 24);
+    MainSm = TTF_OpenFont(path, 16);
   }
 
 

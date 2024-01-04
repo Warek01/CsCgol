@@ -3,13 +3,13 @@ namespace CsGame.Models;
 // Object that is passed to constructor of a scene
 public struct SceneInitObject
 {
-  public IGame     Game;
+  public Game      Game;
   public GameState State;
   public Renderer  Renderer;
   public Font      MainFont;
 
   public void Deconstruct(
-    out IGame        game,
+    out Game         game,
     out WindowState  window,
     out MouseState   mouse,
     out KeyState     keyboard,
