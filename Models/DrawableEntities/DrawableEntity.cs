@@ -11,7 +11,7 @@ public abstract class DrawableEntity : IDisposable
 
   public SDL_Rect SDL_Rect { get; protected set; }
   public Color    Color    { get; protected set; }
-  public IntPtr   Surface  { get; protected set; }
+  public IntPtr   Surface  { get; protected set; } = IntPtr.Zero;
 
   public DrawableEntity(int x, int y, int w, int h, Color? color = null)
   {
@@ -52,6 +52,7 @@ public abstract class DrawableEntity : IDisposable
   public void Dispose()
   {
     SDL_FreeSurface(Surface);
+    Surface = IntPtr.Zero;
   }
 
   public void SetBackgroundColor(Color color)
@@ -62,6 +63,9 @@ public abstract class DrawableEntity : IDisposable
 
   protected void UpdateSurface()
   {
+    if (Surface != IntPtr.Zero)
+      SDL_FreeSurface(Surface);
+
     Surface = SDL_CreateRGBSurfaceWithFormat(0, Width, Height, 32, SDL_PIXELFORMAT_RGBA8888);
 
     EndX     = X + Width;

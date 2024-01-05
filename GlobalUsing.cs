@@ -18,3 +18,4 @@ global using System.Diagnostics;
 global using System.Runtime.InteropServices;
 global using System.Drawing;
 global using System.Linq;
+global using System.Collections.ObjectModel;

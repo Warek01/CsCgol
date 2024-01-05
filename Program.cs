@@ -1,5 +1,10 @@
 ﻿using CsGame.Models;
 
-using var game = new Game(600, 600);
+using var game = new Game
+{
+  FullscreenOnly  = true,
+  ScreenIndex = 1,
+  Title       = "Test",
+};
 
 game.Start();

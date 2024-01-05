@@ -15,4 +15,8 @@
         <Content Include="SDL2\*.so" CopyToOutputDirectory="PreserveNewest"/>
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Models\World\" />
+    </ItemGroup>
+
 </Project>
