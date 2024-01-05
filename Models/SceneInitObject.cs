@@ -5,7 +5,7 @@ public struct SceneInitObject
 {
   public Game      Game;
   public GameState State;
-  public Renderer  Renderer;
+  public IntPtr    Renderer;
   public Font      MainFont;
 
   public void Deconstruct(
@@ -16,7 +16,7 @@ public struct SceneInitObject
     out RuntimeState runtime,
     out OptionsState options,
     out ScreenState  screen,
-    out Renderer     renderer,
+    out IntPtr       renderer,
     out Font         mainFont
   )
   {

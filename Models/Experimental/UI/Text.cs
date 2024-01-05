@@ -14,16 +14,16 @@ public class Text : Element
     }
   }
 
-  public Color Color { get; private set; } = new Color(0x000000FF);
+  public Color Color { get; private set; } = Color.Black;
 
   protected IntPtr Texture = IntPtr.Zero;
   protected IntPtr Font    = IntPtr.Zero;
 
   private uint _wrapWidth = 0;
 
-  public Text(Renderer renderer) : base(renderer) { }
+  public Text(IntPtr renderer) : base(renderer) { }
 
-  public Text(Renderer renderer, IntPtr font, string text, uint wrapWidth = 0) : base(renderer)
+  public Text(IntPtr renderer, IntPtr font, string text, uint wrapWidth = 0) : base(renderer)
   {
     TextValue = text;
     Font      = font;
@@ -31,7 +31,7 @@ public class Text : Element
     UpdateTexture();
   }
 
-  public Text(Renderer renderer, IntPtr font) : base(renderer)
+  public Text(IntPtr renderer, IntPtr font) : base(renderer)
   {
     Font = font;
   }
@@ -50,7 +50,7 @@ public class Text : Element
 
   public override void Render()
   {
-    Renderer.DrawTexture(Texture, Rect);
+    SDL_RenderCopy(Renderer, Texture, IntPtr.Zero, ref Rect);
   }
 
   public override void Dispose()
@@ -64,8 +64,8 @@ public class Text : Element
       SDL_DestroyTexture(Texture);
 
     Texture = WrapWidth > 0
-      ? Renderer.LoadTextTextureWrapped(Font, TextValue, Color, WrapWidth)
-      : Renderer.LoadTextTexture(Font, TextValue, Color);
+      ? SdlUtils.LoadTextTextureWrapped(Renderer, Font, TextValue, Color, WrapWidth)
+      : SdlUtils.LoadTextTexture(Renderer, Font, TextValue, Color);
 
     SDL_QueryTexture(Texture, out uint _, out int _, out Rect.w, out Rect.h);
   }

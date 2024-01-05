@@ -6,7 +6,7 @@ public abstract class Scene : IDisposable
   protected readonly KeyState     Keyboard;
   protected readonly MouseState   Mouse;
   protected readonly WindowState  Window;
-  protected readonly Renderer     Renderer;
+  protected readonly IntPtr       Renderer;
   protected readonly OptionsState Options;
   protected readonly RuntimeState Runtime;
   protected readonly Game         Game;

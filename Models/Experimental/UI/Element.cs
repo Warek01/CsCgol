@@ -12,7 +12,7 @@ public enum UiEvent
 
 public abstract class Element : IDisposable
 {
-  public Renderer Renderer;
+  public IntPtr Renderer;
 
   public int X
   {
@@ -58,7 +58,7 @@ public abstract class Element : IDisposable
 
   private readonly Dictionary<UiEvent, List<Action>> _eventsDict = new();
 
-  public Element(Renderer renderer)
+  public Element(IntPtr renderer)
   {
     Renderer = renderer;
   }

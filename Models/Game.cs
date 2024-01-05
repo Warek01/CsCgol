@@ -9,7 +9,8 @@ public class Game : IDisposable
   private Scene? _nextScene;
 
   private GameState _state;
-  private Renderer  _renderer;
+  private IntPtr    _renderer;
+  private IntPtr    _windowSurface;
   private Font      _mainFont;
 
   public Game(int width, int height)
@@ -43,6 +44,7 @@ public class Game : IDisposable
     _state.Runtime.IsRunning  = true;
 
     InitWindowAndRenderer();
+    SDL_SetRenderDrawBlendMode(_renderer, SDL_BLENDMODE_BLEND);
 
     _mainFont = new Font("UbuntuMono-R.ttf");
 
@@ -69,11 +71,10 @@ public class Game : IDisposable
         _scene?.HandleEvent(e);
       }
 
-      _renderer.SetDrawColor(Color.Maroon);
-      _renderer.Clear();
+      SdlUtils.SetDrawColor(_renderer, Color.Maroon);
+      SDL_RenderClear(_renderer);
       _scene?.OnRender();
-      _renderer.Present();
-
+      SDL_RenderPresent(_renderer);
 
       if (timer.ElapsedMilliseconds < _state.Runtime.FrameDelay)
         Thread.Sleep(_state.Runtime.FrameDelay - (int)timer.ElapsedMilliseconds);
@@ -88,8 +89,6 @@ public class Game : IDisposable
   {
     _scene?.Dispose();
     _nextScene?.Dispose();
-
-    _renderer.Dispose();
 
     SDL_FreeSurface(_state.Window.IconSurface);
 
@@ -223,7 +222,8 @@ public class Game : IDisposable
       SDL_WINDOW_SHOWN
     );
 
-    _renderer = new Renderer(window);
+    _windowSurface = SDL_GetWindowSurface(window);
+    _renderer      = SDL_CreateRenderer(window, 0, SDL_RENDERER_ACCELERATED);
 
     SDL_SetWindowMinimumSize(window, 400, 400);
     SDL_SetWindowMaximumSize(window, _state.Screen.Width, _state.Screen.Height);

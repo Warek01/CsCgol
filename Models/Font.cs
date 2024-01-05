@@ -3,9 +3,9 @@ namespace CsGame.Models;
 // Stores a single font of different sizes
 public class Font : IDisposable
 {
-  public readonly IntPtr MainLg;
-  public readonly IntPtr MainMd;
-  public readonly IntPtr MainSm;
+  public readonly IntPtr RegularLg;
+  public readonly IntPtr RegularMd;
+  public readonly IntPtr RegularSm;
 
   public Font(string file)
   {
@@ -14,17 +14,17 @@ public class Font : IDisposable
 
     string path = Path.Join("Assets", "Fonts", file);
 
-    MainLg = TTF_OpenFont(path, 36);
-    MainMd = TTF_OpenFont(path, 24);
-    MainSm = TTF_OpenFont(path, 16);
+    RegularLg = TTF_OpenFont(path, 36);
+    RegularMd = TTF_OpenFont(path, 24);
+    RegularSm = TTF_OpenFont(path, 16);
   }
 
 
   public void Dispose()
   {
-    TTF_CloseFont(MainLg);
-    TTF_CloseFont(MainMd);
-    TTF_CloseFont(MainSm);
+    TTF_CloseFont(RegularLg);
+    TTF_CloseFont(RegularMd);
+    TTF_CloseFont(RegularSm);
 
     TTF_Quit();
   }

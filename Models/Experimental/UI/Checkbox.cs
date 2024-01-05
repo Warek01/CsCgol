@@ -19,7 +19,7 @@ public class Checkbox : Element
 
   private bool _isChecked;
 
-  public Checkbox(Renderer renderer, IntPtr font, string text) : base(renderer)
+  public Checkbox(IntPtr renderer, IntPtr font, string text) : base(renderer)
   {
     Text           = new Text(renderer, font, text);
     CheckboxRect.h = Text.Height;
@@ -27,7 +27,7 @@ public class Checkbox : Element
     Rect.h         = Text.Height;
     Rect.w         = Text.Width + Text.Height + 10;
 
-    CheckboxTexture = Renderer.LoadTexture("Assets/Images/Checkbox.png");
+    // CheckboxTexture = Renderer.LoadTexture("Assets/Images/Checkbox.png");
 
     AddEventListener(UiEvent.MOUSE_DOWN, () =>
     {
@@ -38,12 +38,12 @@ public class Checkbox : Element
 
   public override void Dispose()
   {
-    Renderer.DestroyTexture(CheckboxTexture);
+    SDL_DestroyTexture(CheckboxTexture);
   }
 
   public override void Render()
   {
-    Renderer.DrawTexture(CheckboxTexture, CheckboxRect, CheckboxClipRect);
+    // Renderer.DrawTexture(CheckboxTexture, CheckboxRect, CheckboxClipRect);
     Text.Render();
   }
 

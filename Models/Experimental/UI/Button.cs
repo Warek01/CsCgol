@@ -2,15 +2,15 @@ namespace CsGame.Models;
 
 public class Button : Element
 {
-  public Color BackgroundColor = new Color(0x000000FF);
-  public Color TextColor       = new Color(0x000000FF);
+  public Color BackgroundColor = Color.White;
+  public Color TextColor       = Color.Black;
 
   protected SDL_Rect BackgroundRect = new SDL_Rect { x = 0, y = 0, w = 0, h = 0 };
   protected SDL_Rect TextRect       = new SDL_Rect { x = 0, y = 0, w = 0, h = 0 };
   protected IntPtr   BackgroundTexture;
   protected IntPtr   TextTexture;
 
-  public Button(Renderer renderer, IntPtr font, string text) : base(renderer)
+  public Button(IntPtr renderer, IntPtr font, string text) : base(renderer)
   {
     LoadText(font, text);
   }
@@ -23,18 +23,18 @@ public class Button : Element
 
   public void LoadText(IntPtr font, string text)
   {
-    TextTexture = Renderer.LoadTextTexture(font, text, TextColor);
+    TextTexture = SdlUtils.LoadTextTexture(Renderer, font, text, TextColor);
     SDL_QueryTexture(TextTexture, out uint _, out int _, out TextRect.w, out TextRect.h);
   }
 
   public override void Render()
   {
-    Color initialColor = Renderer.GetDrawColor();
-    Renderer.SetDrawColor(BackgroundColor);
-    Renderer.FillRect(Rect);
-    Renderer.DrawTexture(BackgroundTexture, Rect);
-    Renderer.DrawTexture(TextTexture, TextRect);
-    Renderer.SetDrawColor(initialColor);
+    Color initialColor = SdlUtils.GetDrawColor(Renderer);
+    SdlUtils.SetDrawColor(Renderer, BackgroundColor);
+    SDL_RenderFillRect(Renderer, ref Rect);
+    // Renderer.DrawTexture(BackgroundTexture, Rect);
+    // Renderer.DrawTexture(TextTexture, TextRect);
+    SdlUtils.SetDrawColor(Renderer, initialColor);
   }
 
   public void AdjustSizeAuto()

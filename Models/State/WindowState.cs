@@ -10,4 +10,5 @@ public class WindowState
   public int    OriginalHeight;
   public bool   IsFullscreen;
   public IntPtr IconSurface;
+  public IntPtr WindowSurface;
 }

@@ -1,4 +1,4 @@
-namespace CsGame.Models;
+namespace CsGame.Experimental;
 
 public struct Color : IEquatable<Color>
 {
@@ -7,7 +7,7 @@ public struct Color : IEquatable<Color>
   public byte B = 0x00;
   public byte A = 0xFF;
 
-  private uint _packedValue = 0x000000FF;
+  public uint PackedValue = 0x000000FF;
 
   public Color() { }
 
@@ -18,7 +18,7 @@ public struct Color : IEquatable<Color>
     B = Convert.ToByte((packedValue >> 8) & 0xFF);
     A = Convert.ToByte(packedValue & 0xFF);
 
-    _packedValue = packedValue;
+    PackedValue = packedValue;
   }
 
   public Color(byte r, byte g, byte b, byte a = 0xFF)
@@ -32,24 +32,24 @@ public struct Color : IEquatable<Color>
 
   public static bool operator ==(Color a, Color b)
   {
-    return a._packedValue == b._packedValue;
+    return a.PackedValue == b.PackedValue;
   }
 
   public static bool operator !=(Color a, Color b)
   {
-    return a._packedValue != b._packedValue;
+    return a.PackedValue != b.PackedValue;
   }
 
   public static Color operator +(Color color, byte value)
   {
-    var c = new Color(color._packedValue);
+    var c = new Color(color.PackedValue);
     c.Lighten(value);
     return c;
   }
 
   public static Color operator -(Color color, byte value)
   {
-    var c = new Color(color._packedValue);
+    var c = new Color(color.PackedValue);
     c.Darken(value);
     return c;
   }
@@ -87,12 +87,12 @@ public struct Color : IEquatable<Color>
 
   public bool Equals(Color obj)
   {
-    return _packedValue == obj._packedValue;
+    return PackedValue == obj.PackedValue;
   }
 
   public override int GetHashCode()
   {
-    return _packedValue.GetHashCode();
+    return PackedValue.GetHashCode();
   }
 
   public override bool Equals(object? obj)
@@ -107,7 +107,7 @@ public struct Color : IEquatable<Color>
 
   private void UpdatePackedValue()
   {
-    _packedValue = 0U | (uint)R << 24 | (uint)G << 16 | (uint)B << 8 | A;
+    PackedValue = 0U | (uint)R << 24 | (uint)G << 16 | (uint)B << 8 | A;
   }
 
   #region Predefined colors

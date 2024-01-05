@@ -12,7 +12,7 @@
 
     <ItemGroup>
         <Content Include="Assets\**" CopyToOutputDirectory="PreserveNewest"/>
-        <Content Include="SDL2\**" CopyToOutputDirectory="PreserveNewest"/>
+        <Content Include="SDL2\*.so" CopyToOutputDirectory="PreserveNewest"/>
     </ItemGroup>
 
 </Project>
