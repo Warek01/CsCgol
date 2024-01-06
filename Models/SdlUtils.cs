@@ -64,7 +64,7 @@ public static class SdlUtils
 
   public static uint ColorToSurfaceFormat(IntPtr surfacePtr, Color color)
   {
-    var surface = Marshal.PtrToStructure<SDL_Surface>(surfacePtr);
+    SDL_Surface surface = Marshal.PtrToStructure<SDL_Surface>(surfacePtr);
     return SDL_MapRGBA(surface.format, color.R, color.G, color.B, color.A);
   }
 

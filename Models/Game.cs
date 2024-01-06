@@ -2,13 +2,13 @@ namespace CsGame.Models;
 
 public class Game : IDisposable
 {
-  public bool   FullscreenOnly { get; init; } = false;
-  public int    Width          { get; init; } = 600;
-  public int    Height         { get; init; } = 800;
-  public int    ScreenIndex    { get; init; } = 0;
-  public string Title          { get; init; } = string.Empty;
-  public int    MinWidth       { get; init; } = 400;
-  public int    MinHeight      { get; init; } = 400;
+  public bool   FullscreenOnly = false;
+  public int    Width          = 600;
+  public int    Height         = 800;
+  public int    ScreenIndex    = 0;
+  public string Title          = string.Empty;
+  public int    MinWidth       = 400;
+  public int    MinHeight      = 400;
 
   private const SDL_WindowFlags WINDOW_FLAGS = SDL_WINDOW_SHOWN;
 
@@ -45,12 +45,17 @@ public class Game : IDisposable
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "best");
     SDL_Init(INIT_FLAGS);
     IMG_Init(IMG_INIT_FLAGS);
+
+    int displayCount = SDL_GetNumVideoDisplays();
+    ScreenIndex = Math.Min(ScreenIndex, displayCount);
+
     SDL_GetDisplayMode(ScreenIndex, 0, out var displayMode);
 
-    _screen.Index       = ScreenIndex;
-    _screen.Width       = displayMode.w;
-    _screen.Height      = displayMode.h;
-    _screen.RefreshRate = displayMode.refresh_rate;
+    _screen.DisplaysCount = displayCount;
+    _screen.Index         = ScreenIndex;
+    _screen.Width         = displayMode.w;
+    _screen.Height        = displayMode.h;
+    _screen.RefreshRate   = displayMode.refresh_rate;
 
     _window.Title          = Title;
     _window.Width          = FullscreenOnly ? displayMode.w : Width;
@@ -109,7 +114,7 @@ public class Game : IDisposable
       SDL_RenderPresent(_renderer);
 
       if (timer.ElapsedMilliseconds < _runtime.FrameDelay)
-        Thread.Sleep(_runtime.FrameDelay - (int)timer.ElapsedMilliseconds);
+        Thread.Sleep((int)Math.Floor(_runtime.FrameDelay - timer.ElapsedMilliseconds));
 
       _runtime.FrameIndex++;
 
@@ -220,6 +225,14 @@ public class Game : IDisposable
       case SDLK_f:
         ToggleFullscreen();
         break;
+
+      // TODO: temp
+      case SDLK_ESCAPE:
+        SDL_SetWindowMouseGrab(
+          _window.WindowPtr,
+          SDL_GetWindowMouseGrab(_window.WindowPtr) == SDL_TRUE ? SDL_FALSE : SDL_TRUE
+        );
+        break;
     }
   }
 
@@ -263,24 +276,21 @@ public class Game : IDisposable
     _renderer      = SDL_CreateRenderer(window, -1, RENDERER_FLAGS);
     SDL_SetRenderDrawBlendMode(_renderer, RENDERER_BLEND_MODE);
 
+    SDL_SetWindowAlwaysOnTop(window, SDL_FALSE);
+    SDL_SetWindowMinimumSize(window, _screen.Width, _screen.Height);
+    SDL_SetWindowMaximumSize(window, _screen.Width, _screen.Height);
+
     if (FullscreenOnly)
     {
-      SDL_SetWindowMinimumSize(window, _screen.Width, _screen.Height);
-      SDL_SetWindowMaximumSize(window, _screen.Width, _screen.Height);
       SDL_SetWindowBordered(window, SDL_FALSE);
-      SDL_SetWindowAlwaysOnTop(window, SDL_TRUE);
       SDL_SetWindowResizable(window, SDL_FALSE);
-      SDL_SetWindowMouseGrab(window, SDL_TRUE);
+      SDL_SetWindowGrab(window, SDL_TRUE);
     }
     else
     {
-      SDL_SetWindowMinimumSize(window, MinWidth, MinHeight);
-      SDL_SetWindowMaximumSize(window, _screen.Width, _screen.Height);
       SDL_SetWindowBordered(window, SDL_TRUE);
-      SDL_SetWindowAlwaysOnTop(window, SDL_FALSE);
       SDL_SetWindowResizable(window, SDL_TRUE);
     }
-
 
     IntPtr iconSurface = IMG_Load("Assets/Images/GameIcon.png");
     SDL_SetWindowIcon(window, iconSurface);

@@ -1,6 +1,6 @@
 namespace CsGame.Models;
 
-public abstract class DrawableEntity : IDisposable
+public abstract class DrawableEntity : IDrawable
 {
   public int X      { get; protected set; }
   public int Y      { get; protected set; }
@@ -13,6 +13,8 @@ public abstract class DrawableEntity : IDisposable
   public Color    Color    { get; protected set; }
   public IntPtr   Surface  { get; protected set; } = IntPtr.Zero;
 
+  public DrawableEntity () {}
+
   public DrawableEntity(int x, int y, int w, int h, Color? color = null)
   {
     X      = x;
@@ -21,35 +23,35 @@ public abstract class DrawableEntity : IDisposable
     Height = h;
     Color  = color ?? Color.Transparent;
 
-    UpdateSurface();
+    CreateNewSurface();
   }
 
   public void SetX(int x)
   {
     X    = x;
     EndX = X + Width;
-    UpdateSurface();
+    CreateNewSurface();
   }
 
   public void SetWidth(int w)
   {
     Width = w;
-    UpdateSurface();
+    CreateNewSurface();
   }
 
   public void SetY(int y)
   {
     Y = y;
-    UpdateSurface();
+    CreateNewSurface();
   }
 
   public void SetHeight(int h)
   {
     Height = h;
-    UpdateSurface();
+    CreateNewSurface();
   }
 
-  public void Dispose()
+  public virtual void Dispose()
   {
     SDL_FreeSurface(Surface);
     Surface = IntPtr.Zero;
@@ -58,18 +60,23 @@ public abstract class DrawableEntity : IDisposable
   public void SetBackgroundColor(Color color)
   {
     Color = color;
-    UpdateSurface();
+    CreateNewSurface();
   }
 
-  protected void UpdateSurface()
+  protected void UpdateEndPosition()
+  {
+    EndX = X + Width;
+    EndY = Y + Height;
+  }
+
+  protected void CreateNewSurface()
   {
     if (Surface != IntPtr.Zero)
       SDL_FreeSurface(Surface);
 
-    Surface = SDL_CreateRGBSurfaceWithFormat(0, Width, Height, 32, SDL_PIXELFORMAT_RGBA8888);
+    UpdateEndPosition();
 
-    EndX     = X + Width;
-    EndY     = Y + Height;
+    Surface = SDL_CreateRGBSurfaceWithFormat(0, Width, Height, 32, SDL_PIXELFORMAT_RGBA8888);
     SDL_Rect = new SDL_Rect { x = X, y = Y, w = Width, h = Height };
 
     var rect = new SDL_Rect { x = 0, y = 0, w = Width, h = Height };

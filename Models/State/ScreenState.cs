@@ -10,4 +10,5 @@ public class ScreenState
   public int  Height;
   // SDL pixel format
   public uint PixelFormat;
+  public int  DisplaysCount;
 }

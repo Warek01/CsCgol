@@ -11,7 +11,7 @@ public class RuntimeState
     set
     {
       _fps       = value;
-      FrameDelay = 1000 / value;
+      FrameDelay = (float) 1000 / value;
     }
   }
 
@@ -21,6 +21,6 @@ public class RuntimeState
     set => _frameIndex = value >= Fps ? 0 : value;
   }
 
-  public int  FrameDelay;
+  public float  FrameDelay;
   public bool IsRunning;
 }

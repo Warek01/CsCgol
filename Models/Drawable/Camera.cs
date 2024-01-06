@@ -13,26 +13,40 @@ public class Camera : DrawableEntity
 
   private World _world;
 
-  public Camera(int x, int y, int w, int h, World world, Color? color = null)
-    : base(x, y, w, h, color)
+  public Camera(int x, int y, int w, int h, World world)
+    : base(x, y, w, h, Color.White)
   {
-    _world = world;
-    UpdateTargetEnds();
+    _world  = world;
+    Surface = SDL_CreateRGBSurfaceWithFormat(0, Width, Height, 32, SDL_PIXELFORMAT_RGBA8888);
+
+    Update();
   }
 
   public void Update()
   {
     UpdateScroll();
-    UpdateSurface();
+    UpdateTargetEnds();
+    Draw();
+  }
 
-    foreach (var entity in _world.Entities)
+  public void Draw()
+  {
+    int rowFrom = Math.Max(TargetY / Tile.HEIGHT - 1, 0);
+    int rowTo   = Math.Min(TargetEndY / Tile.HEIGHT + 1, _world.TileRows - 1);
+    int colFrom = Math.Max(TargetX / Tile.WIDTH - 1, 0);
+    int colTo   = Math.Min(TargetEndX / Tile.WIDTH + 1, _world.TileColumns - 1);
+
+    for (int row = rowFrom; row < rowTo; row++)
+    for (int col = colFrom; col < colTo; col++)
     {
-      if (!IsEntityInBounds(entity)) continue;
+      var tile = _world.Tiles[row, col];
 
-      var unitDstRect = entity.SDL_Rect;
+      if (!IsEntityInBounds(tile)) continue;
+
+      var unitDstRect = tile.SDL_Rect;
       unitDstRect.x -= TargetX;
       unitDstRect.y -= TargetY;
-      SDL_BlitSurface(entity.Surface, IntPtr.Zero, Surface, ref unitDstRect);
+      SDL_BlitSurface(tile.Surface, IntPtr.Zero, Surface, ref unitDstRect);
     }
   }
 

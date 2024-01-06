@@ -5,33 +5,20 @@ public class TestScene : Scene
   public Camera Camera;
   public World  World;
 
-  Color GetRandomColor(Random random)
-  {
-    return Color.FromArgb(random.Next(256), random.Next(256), random.Next(256));
-  }
-
   public TestScene(SceneInitObject init) : base(init)
   {
-    World = new World(10000, 10000);
+    World = new World(1024, 1024);
 
-    var random = new Random();
-    for (int i = 0; i < 100; i++)
+    for (int row = 0; row < World.TileRows; row++)
+    for (int col = 0; col < World.TileColumns; col++)
     {
-      // Generate random values for position, width, height, and color
-      int   x           = random.Next(0, 10001);  // Random x position between 0 and 10000
-      int   y           = random.Next(0, 10001);  // Random y position between 0 and 10000
-      int   width       = random.Next(0, 257);    // Random width between -256 and 256
-      int   height      = random.Next(0, 257);    // Random height between -256 and 256
-      Color randomColor = GetRandomColor(random); // Get a random color
-
-      // Create a new Unit with random parameters and add it to the list
-      World.Entities.Add(new Unit(x, y, Math.Abs(width), Math.Abs(height), randomColor));
+      World.Tiles[row, col] = new Tile(row, col, (row + col) % 2 == 0 ? TileType.SAND : TileType.GRASS_DARK);
     }
 
-    Camera = new Camera(0, 0, Screen.Width, Screen.Height, World, Color.Crimson)
+    Camera = new Camera(0, 0, Screen.Width, Screen.Height, World)
     {
-      ScrollSpeed     = 24,
-      FastScrollSpeed = 48,
+      ScrollSpeed     = 20,
+      FastScrollSpeed = 40,
       TargetX         = 0,
       TargetY         = 0,
     };
@@ -102,9 +89,11 @@ public class TestScene : Scene
   {
     base.Dispose();
 
-    foreach (var entity in World.Entities)
-      entity.Dispose();
+    foreach (var tile in World.Tiles)
+      tile.Dispose();
 
     Camera.Dispose();
+
+    Tile.ClearSharedSurfaces();
   }
 }
