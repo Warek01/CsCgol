@@ -13,10 +13,7 @@
     <ItemGroup>
         <Content Include="Assets\**" CopyToOutputDirectory="PreserveNewest"/>
         <Content Include="SDL2\*.so" CopyToOutputDirectory="PreserveNewest"/>
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Models\World\" />
+        <Content Include="Config.json" CopyToOutputDirectory="PreserveNewest"/>
     </ItemGroup>
 
 </Project>

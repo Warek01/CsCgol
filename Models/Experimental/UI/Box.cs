@@ -5,7 +5,7 @@ public class Box : Element
   public bool  IsFilled = true;
   public Color Color    = new Color();
 
-  public Box(IntPtr renderer) : base(renderer) { }
+  public Box(nint renderer) : base(renderer) { }
 
   public override void Dispose() { }
 

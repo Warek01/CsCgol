@@ -18,7 +18,7 @@ public class Tile : DrawableEntity
 
   protected static int RefCount = 0;
 
-  protected static readonly Dictionary<TileType, IntPtr> SharedSurfacesMap = new();
+  protected static readonly Dictionary<TileType, nint> SharedSurfacesMap = new();
 
   protected static readonly Dictionary<TileType, Color> ColorMap = new()
   {
@@ -44,20 +44,19 @@ public class Tile : DrawableEntity
 
   protected void CreateNewSharedSurface()
   {
-    UpdateEndPosition();
-    SDL_Rect = new SDL_Rect { x = X, y = Y, w = Width, h = Height };
+    UpdateRect();
 
-    if (SharedSurfacesMap.TryGetValue(Type, out IntPtr value))
+    if (SharedSurfacesMap.TryGetValue(Type, out nint value))
     {
-      Surface = value;
+      SDL_Surface = value;
       return;
     }
 
-    Surface = SDL_CreateRGBSurfaceWithFormat(0, WIDTH, HEIGHT, 32, SDL_PIXELFORMAT_RGBA8888);
-    SharedSurfacesMap[Type] = Surface;
+    SDL_Surface = SDL_CreateRGBSurfaceWithFormat(0, WIDTH, HEIGHT, 32, SDL_PIXELFORMAT_RGBA8888);
+    SharedSurfacesMap[Type] = SDL_Surface;
 
-    uint color = SdlUtils.ColorToSurfaceFormat(Surface, ColorMap[Type]);
-    SDL_FillRect(Surface, IntPtr.Zero, color);
+    uint color = SdlUtils.ColorToSurfaceFormat(SDL_Surface, ColorMap[Type]);
+    SDL_FillRect(SDL_Surface, nint.Zero, color);
   }
 
   public static void ClearSharedSurfaces()

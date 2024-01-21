@@ -2,12 +2,15 @@ namespace CsGame.Models;
 
 public class TestScene : Scene
 {
-  public Camera Camera;
-  public World  World;
+  public Camera             Camera;
+  public World              World;
+  public MouseState         MouseState;
+  public SelectionRectangle SelectionRectangle;
 
-  public TestScene(SceneInitObject init) : base(init)
+  public TestScene(Game game) : base(game)
   {
-    World = new World(1024, 1024);
+    SelectionRectangle = new SelectionRectangle();
+    World              = new World(256, 256);
 
     for (int row = 0; row < World.TileRows; row++)
     for (int col = 0; col < World.TileColumns; col++)
@@ -17,8 +20,8 @@ public class TestScene : Scene
 
     Camera = new Camera(0, 0, Screen.Width, Screen.Height, World)
     {
-      ScrollSpeed     = 20,
-      FastScrollSpeed = 40,
+      ScrollSpeed     = InitialConfig.Game.ScrollSpeed,
+      FastScrollSpeed = InitialConfig.Game.FastScrollSpeed,
       TargetX         = 0,
       TargetY         = 0,
     };
@@ -26,20 +29,24 @@ public class TestScene : Scene
 
   public override void OnRender()
   {
-    if (Mouse.X == 0)
-      Camera.Scroll(Direction.LEFT);
-    else if (Mouse.X == Screen.Width - 1)
-      Camera.Scroll(Direction.RIGHT);
+    if (Window.IsFocused)
+    {
+      if (Mouse.X == 0)
+        Camera.Scroll(Direction.LEFT);
+      else if (Mouse.X == Screen.Width - 1)
+        Camera.Scroll(Direction.RIGHT);
 
-    if (Mouse.Y == 0)
-      Camera.Scroll(Direction.UP);
-    else if (Mouse.Y == Screen.Height - 1)
-      Camera.Scroll(Direction.DOWN);
+      if (Mouse.Y == 0)
+        Camera.Scroll(Direction.UP);
+      else if (Mouse.Y == Screen.Height - 1)
+        Camera.Scroll(Direction.DOWN);
+    }
 
     Camera.Update();
-    IntPtr cameraTexture = SDL_CreateTextureFromSurface(Renderer, Camera.Surface);
-    var    cameraRect    = Camera.SDL_Rect;
-    SDL_RenderCopy(Renderer, cameraTexture, IntPtr.Zero, ref cameraRect);
+    nint cameraTexture = SDL_CreateTextureFromSurface(Renderer, Camera.SDL_Surface);
+    var  cameraRect    = SdlUtils.CreateRect(Camera);
+
+    SDL_RenderCopy(Renderer, cameraTexture, nint.Zero, ref cameraRect);
     SDL_DestroyTexture(cameraTexture);
   }
 
@@ -83,6 +90,11 @@ public class TestScene : Scene
         Camera.StopScroll(Direction.DOWN);
         break;
     }
+  }
+
+  public override void OnMouseDown()
+  {
+    if (MouseState == MouseState.DEFAULT) { }
   }
 
   public override void Dispose()

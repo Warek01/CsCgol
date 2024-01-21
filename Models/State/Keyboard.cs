@@ -1,6 +1,6 @@
 namespace CsGame.Models;
 
-public class KeyState
+public class Keyboard
 {
   public bool         KeyPressed   = false;
   public bool         ShiftPressed = false;

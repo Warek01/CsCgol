@@ -1,7 +1,7 @@
 namespace CsGame.Models;
 
 // Represents mouse cursor
-public class MouseState
+public class Mouse
 {
   public int  X;
   public int  Y;

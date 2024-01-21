@@ -7,10 +7,10 @@ public class Button : Element
 
   protected SDL_Rect BackgroundRect = new SDL_Rect { x = 0, y = 0, w = 0, h = 0 };
   protected SDL_Rect TextRect       = new SDL_Rect { x = 0, y = 0, w = 0, h = 0 };
-  protected IntPtr   BackgroundTexture;
-  protected IntPtr   TextTexture;
+  protected nint   BackgroundTexture;
+  protected nint   TextTexture;
 
-  public Button(IntPtr renderer, IntPtr font, string text) : base(renderer)
+  public Button(nint renderer, nint font, string text) : base(renderer)
   {
     LoadText(font, text);
   }
@@ -21,7 +21,7 @@ public class Button : Element
     SDL_QueryTexture(BackgroundTexture, out uint _, out int _, out BackgroundRect.w, out BackgroundRect.h);
   }
 
-  public void LoadText(IntPtr font, string text)
+  public void LoadText(nint font, string text)
   {
     TextTexture = SdlUtils.LoadTextTexture(Renderer, font, text, TextColor);
     SDL_QueryTexture(TextTexture, out uint _, out int _, out TextRect.w, out TextRect.h);

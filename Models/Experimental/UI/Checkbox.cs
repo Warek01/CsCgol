@@ -12,14 +12,14 @@ public class Checkbox : Element
     }
   }
 
-  protected IntPtr   CheckboxTexture;
+  protected nint   CheckboxTexture;
   protected SDL_Rect CheckboxClipRect = new SDL_Rect { w = 78, h = 78, x = 0, y = 0 };
   protected SDL_Rect CheckboxRect     = new SDL_Rect { w = 78, h = 78, x = 0, y = 0 };
   protected Text     Text;
 
   private bool _isChecked;
 
-  public Checkbox(IntPtr renderer, IntPtr font, string text) : base(renderer)
+  public Checkbox(nint renderer, nint font, string text) : base(renderer)
   {
     Text           = new Text(renderer, font, text);
     CheckboxRect.h = Text.Height;

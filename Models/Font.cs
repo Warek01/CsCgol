@@ -3,9 +3,9 @@ namespace CsGame.Models;
 // Stores a single font of different sizes
 public class Font : IDisposable
 {
-  public readonly IntPtr RegularLg;
-  public readonly IntPtr RegularMd;
-  public readonly IntPtr RegularSm;
+  public readonly nint RegularLg;
+  public readonly nint RegularMd;
+  public readonly nint RegularSm;
 
   public Font(string file)
   {

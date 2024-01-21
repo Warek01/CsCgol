@@ -1,6 +1,6 @@
 namespace CsGame.Models;
 
-public class OptionsState
+public class Options
 {
   // Game options
 }

@@ -16,14 +16,14 @@ public class Text : Element
 
   public Color Color { get; private set; } = Color.Black;
 
-  protected IntPtr Texture = IntPtr.Zero;
-  protected IntPtr Font    = IntPtr.Zero;
+  protected nint Texture = nint.Zero;
+  protected nint Font    = nint.Zero;
 
   private uint _wrapWidth = 0;
 
-  public Text(IntPtr renderer) : base(renderer) { }
+  public Text(nint renderer) : base(renderer) { }
 
-  public Text(IntPtr renderer, IntPtr font, string text, uint wrapWidth = 0) : base(renderer)
+  public Text(nint renderer, nint font, string text, uint wrapWidth = 0) : base(renderer)
   {
     TextValue = text;
     Font      = font;
@@ -31,7 +31,7 @@ public class Text : Element
     UpdateTexture();
   }
 
-  public Text(IntPtr renderer, IntPtr font) : base(renderer)
+  public Text(nint renderer, nint font) : base(renderer)
   {
     Font = font;
   }
@@ -50,7 +50,7 @@ public class Text : Element
 
   public override void Render()
   {
-    SDL_RenderCopy(Renderer, Texture, IntPtr.Zero, ref Rect);
+    SDL_RenderCopy(Renderer, Texture, nint.Zero, ref Rect);
   }
 
   public override void Dispose()
@@ -60,7 +60,7 @@ public class Text : Element
 
   protected void UpdateTexture()
   {
-    if (Texture != IntPtr.Zero)
+    if (Texture != nint.Zero)
       SDL_DestroyTexture(Texture);
 
     Texture = WrapWidth > 0

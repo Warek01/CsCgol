@@ -1,14 +1,17 @@
 namespace CsGame.Models;
 
-public class Game : IDisposable
+public class Game : IGame
 {
-  public bool   FullscreenOnly = false;
-  public int    Width          = 600;
-  public int    Height         = 800;
-  public int    ScreenIndex    = 0;
-  public string Title          = string.Empty;
-  public int    MinWidth       = 400;
-  public int    MinHeight      = 400;
+  public readonly Keyboard Keyboard = new Keyboard();
+  public readonly Mouse    Mouse    = new Mouse();
+  public readonly Screen   Screen   = new Screen();
+  public readonly Window   Window   = new Window();
+  public readonly Options  Options  = new Options();
+  public readonly Runtime  Runtime  = new Runtime();
+
+  public Font   MainFont;
+  public nint   Renderer;
+  public Config InitialConfig;
 
   private const SDL_WindowFlags WINDOW_FLAGS = SDL_WINDOW_SHOWN;
 
@@ -20,79 +23,53 @@ public class Game : IDisposable
   private const SDL_RendererFlags RENDERER_FLAGS      = SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC;
   private const SDL_BlendMode     RENDERER_BLEND_MODE = SDL_BLENDMODE_BLEND;
 
-  private readonly KeyState     _keyboard = new KeyState();
-  private readonly MouseState   _mouse    = new MouseState();
-  private readonly ScreenState  _screen   = new ScreenState();
-  private readonly WindowState  _window   = new WindowState();
-  private readonly OptionsState _options  = new OptionsState();
-  private readonly RuntimeState _runtime  = new RuntimeState();
-
-  private Scene?    _scene         = null;
-  private IntPtr    _cursor        = IntPtr.Zero;
-  private Scene?    _nextScene     = null;
-  private bool      _wasInit       = false;
-  private GameState _state         = null!;
-  private IntPtr    _renderer      = IntPtr.Zero;
-  private IntPtr    _windowSurface = IntPtr.Zero;
-  private Font      _mainFont      = null!;
+  private Scene? _scene     = null;
+  private nint   _cursor    = nint.Zero;
+  private Scene? _nextScene = null;
 
 
-  public void Init()
+  public Game()
   {
-    if (_wasInit) return;
-    _wasInit = true;
+    ReadConfigFile();
 
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "best");
     SDL_Init(INIT_FLAGS);
     IMG_Init(IMG_INIT_FLAGS);
 
     int displayCount = SDL_GetNumVideoDisplays();
-    ScreenIndex = Math.Min(ScreenIndex, displayCount);
+    Screen.Index         = Math.Min(InitialConfig.ScreenIndex, displayCount - 1);
+    Screen.DisplaysCount = displayCount;
+    SDL_GetDisplayMode(Screen.Index, 0, out var displayMode);
+    Screen.Width       = displayMode.w;
+    Screen.Height      = displayMode.h;
+    Screen.RefreshRate = displayMode.refresh_rate;
 
-    SDL_GetDisplayMode(ScreenIndex, 0, out var displayMode);
+    Window.Title          = "Test game";
+    Window.Width          = InitialConfig.Window.FullscreenOnly ? displayMode.w : InitialConfig.Window.InitialWidth;
+    Window.Height         = InitialConfig.Window.FullscreenOnly ? displayMode.h : InitialConfig.Window.InitialHeight;
+    Window.IsFullscreen   = InitialConfig.Window.FullscreenOnly;
+    Window.OriginalWidth  = Window.Width;
+    Window.OriginalHeight = Window.Height;
 
-    _screen.DisplaysCount = displayCount;
-    _screen.Index         = ScreenIndex;
-    _screen.Width         = displayMode.w;
-    _screen.Height        = displayMode.h;
-    _screen.RefreshRate   = displayMode.refresh_rate;
-
-    _window.Title          = Title;
-    _window.Width          = FullscreenOnly ? displayMode.w : Width;
-    _window.Height         = FullscreenOnly ? displayMode.h : Height;
-    _window.IsFullscreen   = FullscreenOnly;
-    _window.OriginalWidth  = _window.Width;
-    _window.OriginalHeight = _window.Height;
-
-    _runtime.Fps        = _screen.RefreshRate;
-    _runtime.FrameIndex = 0;
-    _runtime.IsRunning  = true;
-
-    _state = new GameState
-    {
-      Keyboard = _keyboard,
-      Mouse    = _mouse,
-      Screen   = _screen,
-      Window   = _window,
-      Options  = _options,
-      Runtime  = _runtime,
-    };
+    Runtime.Fps        = InitialConfig.Runtime.TargetFps == -1 ? Screen.RefreshRate : InitialConfig.Runtime.TargetFps;
+    Runtime.FrameIndex = 0;
+    Runtime.IsRunning  = true;
+    Runtime.FrameTimer = new Stopwatch();
 
     InitWindowAndRenderer();
     InitCursor();
 
-    _mainFont = new Font("UbuntuMono-R.ttf");
+    MainFont = new Font("UbuntuMono-R.ttf");
 
-    SetNextScene<TestScene>();
+    SetScene<TestScene>();
+
+    if (InitialConfig.Window.InitialFullscreen)
+      ToggleFullscreen();
   }
 
   public void Start()
   {
-    if (!_wasInit) Init();
-
-    var timer = new Stopwatch();
-
-    while (_runtime.IsRunning)
+    while (Runtime.IsRunning)
     {
       if (_nextScene != null)
       {
@@ -108,17 +85,13 @@ public class Game : IDisposable
         _scene?.HandleEvent(e);
       }
 
-      SdlUtils.SetDrawColor(_renderer, Color.Maroon);
-      SDL_RenderClear(_renderer);
+      SdlUtils.SetDrawColor(Renderer, Color.Maroon);
+      SDL_RenderClear(Renderer);
       _scene?.OnRender();
-      SDL_RenderPresent(_renderer);
+      SDL_RenderPresent(Renderer);
+      Runtime.FrameIndex++;
 
-      if (timer.ElapsedMilliseconds < _runtime.FrameDelay)
-        Thread.Sleep((int)Math.Floor(_runtime.FrameDelay - timer.ElapsedMilliseconds));
-
-      _runtime.FrameIndex++;
-
-      timer.Restart();
+      FrameSleep();
     }
   }
 
@@ -127,12 +100,12 @@ public class Game : IDisposable
     _scene?.Dispose();
     _nextScene?.Dispose();
 
-    if (_cursor != IntPtr.Zero)
+    if (_cursor != nint.Zero)
       SDL_FreeCursor(_cursor);
 
-    SDL_FreeSurface(_window.IconSurface);
+    SDL_FreeSurface(Window.IconSurface);
 
-    SDL_DestroyWindow(_window.WindowPtr);
+    SDL_DestroyWindow(Window.WindowPtr);
     SDL_Quit();
   }
 
@@ -141,7 +114,7 @@ public class Game : IDisposable
     switch (e.type)
     {
       case SDL_QUIT:
-        _runtime.IsRunning = false;
+        Runtime.IsRunning = false;
         break;
       case SDL_MOUSEBUTTONDOWN:
       case SDL_MOUSEBUTTONUP:
@@ -174,15 +147,7 @@ public class Game : IDisposable
 
   private Scene InstantiateScene<TSceneClass>() where TSceneClass : Scene
   {
-    var init = new SceneInitObject
-    {
-      Game     = this,
-      MainFont = _mainFont,
-      State    = _state,
-      Renderer = _renderer,
-    };
-
-    object? instance = Activator.CreateInstance(typeof(TSceneClass), init);
+    object? instance = Activator.CreateInstance(typeof(TSceneClass), this);
 
     if (instance is null)
       throw new Exception("Error instantiating scene");
@@ -195,22 +160,29 @@ public class Game : IDisposable
     switch (e.window.windowEvent)
     {
       case SDL_WINDOWEVENT_RESIZED:
-        _window.Width  = e.window.data1;
-        _window.Height = e.window.data2;
+        Window.Width  = e.window.data1;
+        Window.Height = e.window.data2;
         break;
       case SDL_WINDOWEVENT_MAXIMIZED:
       case SDL_WINDOWEVENT_RESTORED:
-        SDL_GetWindowSize(_window.WindowPtr, out _window.Width, out _window.Height);
+        SDL_GetWindowSize(Window.WindowPtr, out Window.Width, out Window.Height);
+        break;
+      case SDL_WINDOWEVENT_TAKE_FOCUS:
+      case SDL_WINDOWEVENT_FOCUS_GAINED:
+        Window.IsFocused = true;
+        break;
+      case SDL_WINDOWEVENT_FOCUS_LOST:
+        Window.IsFocused = false;
         break;
     }
   }
 
   private void HandleMouseEvent(SDL_Event e)
   {
-    _mouse.X               = e.button.x;
-    _mouse.Y               = e.button.y;
-    _mouse.Button          = e.button.button;
-    _mouse.IsButtonPressed = e.type == SDL_MOUSEBUTTONDOWN;
+    Mouse.X               = e.button.x;
+    Mouse.Y               = e.button.y;
+    Mouse.Button          = e.button.button;
+    Mouse.IsButtonPressed = e.type == SDL_MOUSEBUTTONDOWN;
   }
 
   private void HandleKeyDown(SDL_Event e)
@@ -220,7 +192,7 @@ public class Game : IDisposable
     switch (e.key.keysym.sym)
     {
       case SDLK_q:
-        _runtime.IsRunning = false;
+        Runtime.IsRunning = false;
         break;
       case SDLK_f:
         ToggleFullscreen();
@@ -229,8 +201,8 @@ public class Game : IDisposable
       // TODO: temp
       case SDLK_ESCAPE:
         SDL_SetWindowMouseGrab(
-          _window.WindowPtr,
-          SDL_GetWindowMouseGrab(_window.WindowPtr) == SDL_TRUE ? SDL_FALSE : SDL_TRUE
+          Window.WindowPtr,
+          SDL_GetWindowMouseGrab(Window.WindowPtr) == SDL_TRUE ? SDL_FALSE : SDL_TRUE
         );
         break;
     }
@@ -244,43 +216,46 @@ public class Game : IDisposable
   private void HandleKeyEvent(SDL_Event e)
   {
     SDL_Keymod state = SDL_GetModState();
-    _keyboard.KeyPressed   = true;
-    _keyboard.Key          = e.key.keysym.sym;
-    _keyboard.AltPressed   = (state & KMOD_ALT) != 0;
-    _keyboard.CtrlPressed  = (state & KMOD_CTRL) != 0;
-    _keyboard.CapsPressed  = (state & KMOD_CAPS) != 0;
-    _keyboard.ShiftPressed = (state & KMOD_SHIFT) != 0;
-    _keyboard.GuiPressed   = (state & KMOD_GUI) != 0;
+    Keyboard.KeyPressed   = true;
+    Keyboard.Key          = e.key.keysym.sym;
+    Keyboard.AltPressed   = (state & KMOD_ALT) != 0;
+    Keyboard.CtrlPressed  = (state & KMOD_CTRL) != 0;
+    Keyboard.CapsPressed  = (state & KMOD_CAPS) != 0;
+    Keyboard.ShiftPressed = (state & KMOD_SHIFT) != 0;
+    Keyboard.GuiPressed   = (state & KMOD_GUI) != 0;
   }
 
   private void HandleMouseMove(SDL_Event e)
   {
-    _mouse.X = e.motion.x;
-    _mouse.Y = e.motion.y;
+    Mouse.X = e.motion.x;
+    Mouse.Y = e.motion.y;
   }
 
   private void InitWindowAndRenderer()
   {
-    SDL_WindowFlags windowFlags = FullscreenOnly ? FULLSCREEN_WINDOW_FLAGS : WINDOW_FLAGS;
+    SDL_WindowFlags windowFlags = InitialConfig.Window.FullscreenOnly ? FULLSCREEN_WINDOW_FLAGS : WINDOW_FLAGS;
 
-    IntPtr window = SDL_CreateWindow(
-      _window.Title,
-      SDL_WINDOWPOS_CENTERED_DISPLAY(ScreenIndex),
-      SDL_WINDOWPOS_CENTERED_DISPLAY(ScreenIndex),
-      _window.Width,
-      _window.Height,
+    nint window = SDL_CreateWindow(
+      Window.Title,
+      SDL_WINDOWPOS_CENTERED_DISPLAY(Screen.Index),
+      SDL_WINDOWPOS_CENTERED_DISPLAY(Screen.Index),
+      Window.Width,
+      Window.Height,
       windowFlags
     );
 
-    _windowSurface = SDL_GetWindowSurface(window);
-    _renderer      = SDL_CreateRenderer(window, -1, RENDERER_FLAGS);
-    SDL_SetRenderDrawBlendMode(_renderer, RENDERER_BLEND_MODE);
+    Renderer = SDL_CreateRenderer(window, -1, RENDERER_FLAGS);
+    SDL_SetRenderDrawBlendMode(Renderer, RENDERER_BLEND_MODE);
 
     SDL_SetWindowAlwaysOnTop(window, SDL_FALSE);
-    SDL_SetWindowMinimumSize(window, _screen.Width, _screen.Height);
-    SDL_SetWindowMaximumSize(window, _screen.Width, _screen.Height);
 
-    if (FullscreenOnly)
+    if (InitialConfig.Window.MinWidth != -1 && InitialConfig.Window.MinHeight != -1)
+      SDL_SetWindowMinimumSize(window, InitialConfig.Window.MinWidth, InitialConfig.Window.MinHeight);
+
+    if (InitialConfig.Window.MaxWidth != -1 && InitialConfig.Window.MaxHeight != -1)
+      SDL_SetWindowMaximumSize(window, InitialConfig.Window.MaxWidth, InitialConfig.Window.MaxHeight);
+
+    if (InitialConfig.Window.FullscreenOnly)
     {
       SDL_SetWindowBordered(window, SDL_FALSE);
       SDL_SetWindowResizable(window, SDL_FALSE);
@@ -292,43 +267,43 @@ public class Game : IDisposable
       SDL_SetWindowResizable(window, SDL_TRUE);
     }
 
-    IntPtr iconSurface = IMG_Load("Assets/Images/GameIcon.png");
+    nint iconSurface = IMG_Load("Assets/Images/GameIcon.png");
     SDL_SetWindowIcon(window, iconSurface);
 
-    _window.WindowPtr   = window;
-    _window.IconSurface = iconSurface;
+    Window.WindowPtr   = window;
+    Window.IconSurface = iconSurface;
   }
 
   private void ToggleFullscreen()
   {
-    if (FullscreenOnly) return;
+    if (InitialConfig.Window.FullscreenOnly) return;
 
-    if (_window.IsFullscreen)
+    if (Window.IsFullscreen)
     {
-      SDL_SetWindowFullscreen(_window.WindowPtr, 0);
-      SDL_SetWindowSize(_window.WindowPtr, _window.OriginalWidth, _window.OriginalHeight);
+      SDL_SetWindowFullscreen(Window.WindowPtr, 0);
+      SDL_SetWindowSize(Window.WindowPtr, Window.OriginalWidth, Window.OriginalHeight);
       SDL_SetWindowPosition(
-        _window.WindowPtr,
-        SDL_WINDOWPOS_CENTERED_DISPLAY(ScreenIndex),
-        SDL_WINDOWPOS_CENTERED_DISPLAY(ScreenIndex)
+        Window.WindowPtr,
+        SDL_WINDOWPOS_CENTERED_DISPLAY(Screen.Index),
+        SDL_WINDOWPOS_CENTERED_DISPLAY(Screen.Index)
       );
-      SDL_SetWindowBordered(_window.WindowPtr, SDL_TRUE);
-      SDL_SetWindowMouseGrab(_window.WindowPtr, SDL_FALSE);
+      SDL_SetWindowBordered(Window.WindowPtr, SDL_TRUE);
+      SDL_SetWindowMouseGrab(Window.WindowPtr, SDL_FALSE);
 
-      _window.Width  = _window.OriginalWidth;
-      _window.Height = _window.OriginalHeight;
+      Window.Width  = Window.OriginalWidth;
+      Window.Height = Window.OriginalHeight;
     }
     else
     {
-      SDL_SetWindowFullscreen(_window.WindowPtr, (uint)SDL_WINDOW_FULLSCREEN_DESKTOP);
-      SDL_SetWindowBordered(_window.WindowPtr, SDL_FALSE);
-      SDL_SetWindowMouseGrab(_window.WindowPtr, SDL_TRUE);
+      SDL_SetWindowFullscreen(Window.WindowPtr, (uint)SDL_WINDOW_FULLSCREEN_DESKTOP);
+      SDL_SetWindowBordered(Window.WindowPtr, SDL_FALSE);
+      SDL_SetWindowMouseGrab(Window.WindowPtr, SDL_TRUE);
 
-      _window.Width  = _screen.Width;
-      _window.Height = _screen.Height;
+      Window.Width  = Screen.Width;
+      Window.Height = Screen.Height;
     }
 
-    _window.IsFullscreen = !_window.IsFullscreen;
+    Window.IsFullscreen = !Window.IsFullscreen;
 
     _scene?.OnToggleFullscreen();
   }
@@ -337,9 +312,29 @@ public class Game : IDisposable
   {
     _cursor = SDL_CreateColorCursor(IMG_Load("Assets/Images/GameCursor.webp"), 0, 0);
 
-    if (_cursor != IntPtr.Zero)
+    if (_cursor != nint.Zero)
       SDL_SetCursor(_cursor);
 
-    SDL_WarpMouseInWindow(_window.WindowPtr, _window.Width / 2, _window.Height / 2);
+    SDL_WarpMouseInWindow(Window.WindowPtr, Window.Width / 2, Window.Height / 2);
+  }
+
+  private void FrameSleep()
+  {
+    if (Runtime.FrameTimer.ElapsedMilliseconds >= Runtime.FrameDelay) return;
+
+    int delay = Convert.ToInt32(Math.Floor(Runtime.FrameDelay - Runtime.FrameTimer.ElapsedMilliseconds));
+    Thread.Sleep(delay);
+    Runtime.FrameTimer.Restart();
+  }
+
+  private void ReadConfigFile()
+  {
+    string  content = File.ReadAllText("Config.json", Encoding.UTF8);
+    Config? config  = JsonSerializer.Deserialize<Config>(content);
+
+    if (config is null)
+      throw new ApplicationException("Config is null");
+
+    InitialConfig = config;
   }
 }

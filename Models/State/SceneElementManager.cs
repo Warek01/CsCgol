@@ -6,13 +6,13 @@ public class SceneElementManager
   public class EventManager
   {
     private readonly List<Element> _elements;
-    private readonly MouseState    _mouse;
+    private readonly Mouse    _mouse;
 
     private Element? _hoveredElement;
     private bool     _isDisabled = false;
 
 
-    public EventManager(List<Element> elements, MouseState mouse)
+    public EventManager(List<Element> elements, Mouse mouse)
     {
       _elements = elements;
       _mouse    = mouse;
@@ -75,7 +75,7 @@ public class SceneElementManager
   private readonly List<Element> _elements = new();
   private readonly EventManager  _eventManager;
 
-  public SceneElementManager(MouseState mouse)
+  public SceneElementManager(Mouse mouse)
   {
     _eventManager = new EventManager(_elements, mouse);
   }

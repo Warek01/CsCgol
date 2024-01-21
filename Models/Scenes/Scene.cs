@@ -3,24 +3,34 @@ namespace CsGame.Models;
 // Abstract scene representing a particular global game state like menu, ingame etc.
 public abstract class Scene : IDisposable
 {
-  protected readonly KeyState     Keyboard;
-  protected readonly MouseState   Mouse;
-  protected readonly WindowState  Window;
-  protected readonly IntPtr       Renderer;
-  protected readonly OptionsState Options;
-  protected readonly RuntimeState Runtime;
-  protected readonly Game         Game;
-  protected readonly Font         MainFont;
-  protected readonly ScreenState  Screen;
+  protected readonly Game     Game;
+  protected readonly Keyboard Keyboard;
+  protected readonly Mouse    Mouse;
+  protected readonly Window   Window;
+  protected readonly nint     Renderer;
+  protected readonly Options  Options;
+  protected readonly Runtime  Runtime;
+  protected readonly Screen   Screen;
+  protected readonly Font     MainFont;
+  protected readonly Config   InitialConfig;
 
   protected readonly SceneElementManager ElementManager;
 
   private readonly SceneElementManager.EventManager  _eventManager;
   private readonly Dictionary<SDL_EventType, Action> _eventDict;
 
-  public Scene(SceneInitObject init)
+  public Scene(Game game)
   {
-    (Game, Window, Mouse, Keyboard, Runtime, Options, Screen, Renderer, MainFont) = init;
+    Game          = game;
+    Keyboard      = game.Keyboard;
+    Mouse         = game.Mouse;
+    Window        = game.Window;
+    Renderer      = game.Renderer;
+    Options       = game.Options;
+    Runtime       = game.Runtime;
+    Screen        = game.Screen;
+    MainFont      = game.MainFont;
+    InitialConfig = game.InitialConfig;
 
     ElementManager = new SceneElementManager(Mouse);
     _eventManager  = ElementManager.GetEventManager();
@@ -91,6 +101,7 @@ public abstract class Scene : IDisposable
         OnFocusLost();
         break;
       case SDL_WINDOWEVENT_FOCUS_GAINED:
+      case SDL_WINDOWEVENT_TAKE_FOCUS:
         OnFocusGain();
         break;
     }

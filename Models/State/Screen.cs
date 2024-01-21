@@ -1,7 +1,7 @@
 namespace CsGame.Models;
 
 // Current screen (monitor)
-public class ScreenState
+public class Screen
 {
   // Which monitor
   public int  Index;

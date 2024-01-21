@@ -1,85 +1,108 @@
 namespace CsGame.Models;
 
-public abstract class DrawableEntity : IDrawable
+public abstract class DrawableEntity : IDisposable, IRectangleBounds, ISdlSurfaceProvider
 {
-  public int X      { get; protected set; }
-  public int Y      { get; protected set; }
-  public int Width  { get; protected set; }
-  public int Height { get; protected set; }
-  public int EndX   { get; protected set; }
-  public int EndY   { get; protected set; }
+  public int    X           { get; protected set; } = 0;
+  public int    Y           { get; protected set; } = 0;
+  public int    Width       { get; protected set; } = 0;
+  public int    Height      { get; protected set; } = 0;
+  public int    EndX        { get; protected set; } = 0;
+  public int    EndY        { get; protected set; } = 0;
+  public Color  Color       { get; protected set; } = Color.Transparent;
+  public nint SDL_Surface { get; protected set; } = nint.Zero;
 
-  public SDL_Rect SDL_Rect { get; protected set; }
-  public Color    Color    { get; protected set; }
-  public IntPtr   Surface  { get; protected set; } = IntPtr.Zero;
-
-  public DrawableEntity () {}
+  public DrawableEntity() { }
 
   public DrawableEntity(int x, int y, int w, int h, Color? color = null)
   {
-    X      = x;
-    Y      = y;
-    Width  = w;
-    Height = h;
-    Color  = color ?? Color.Transparent;
-
-    CreateNewSurface();
+    X        = x;
+    Y        = y;
+    Width    = w;
+    Height   = h;
+    Color    = color ?? Color.Transparent;
+    EndX     = X + Width;
+    EndY     = Y + Height;
   }
 
-  public void SetX(int x)
+  public virtual bool ContainsInBounds(int x, int y)
+  {
+    return x >= X && x <= EndX && y >= Y && y <= EndY;
+  }
+
+  public virtual bool ContainsInBounds(IRectangleBounds d)
+  {
+    return d.X < EndX
+      && X < d.EndX
+      && d.Y < EndY
+      && Y < d.EndY;
+  }
+
+  public static bool ContainsInBounds(IRectangleBounds d1, IRectangleBounds d2)
+  {
+    return d1.X < d2.EndX
+      && d2.X < d1.EndX
+      && d1.Y < d2.EndY
+      && d2.Y < d1.EndY;
+  }
+
+  public virtual void SetX(int x)
   {
     X    = x;
     EndX = X + Width;
-    CreateNewSurface();
+    Update();
   }
 
-  public void SetWidth(int w)
+  public virtual void SetWidth(int w)
   {
     Width = w;
-    CreateNewSurface();
+    Update();
   }
 
-  public void SetY(int y)
+  public virtual void SetY(int y)
   {
     Y = y;
-    CreateNewSurface();
+    Update();
   }
 
-  public void SetHeight(int h)
+  public virtual void SetHeight(int h)
   {
     Height = h;
-    CreateNewSurface();
+    Update();
+  }
+
+  public virtual void SetBackgroundColor(Color color)
+  {
+    Color = color;
+    Update();
   }
 
   public virtual void Dispose()
   {
-    SDL_FreeSurface(Surface);
-    Surface = IntPtr.Zero;
+    SDL_FreeSurface(SDL_Surface);
+    SDL_Surface = nint.Zero;
   }
 
-  public void SetBackgroundColor(Color color)
+
+  public virtual void Update()
   {
-    Color = color;
-    CreateNewSurface();
+    UpdateRect();
+    UpdateSurface();
   }
 
-  protected void UpdateEndPosition()
+  public virtual void UpdateRect()
   {
-    EndX = X + Width;
-    EndY = Y + Height;
+    EndX     = X + Width;
+    EndY     = Y + Height;
   }
 
-  protected void CreateNewSurface()
+  public virtual void UpdateSurface()
   {
-    if (Surface != IntPtr.Zero)
-      SDL_FreeSurface(Surface);
+    if (SDL_Surface != nint.Zero)
+      SDL_FreeSurface(SDL_Surface);
 
-    UpdateEndPosition();
+    SDL_Surface = SDL_CreateRGBSurfaceWithFormat(0, Width, Height, 32, SDL_PIXELFORMAT_RGBA8888);
 
-    Surface = SDL_CreateRGBSurfaceWithFormat(0, Width, Height, 32, SDL_PIXELFORMAT_RGBA8888);
-    SDL_Rect = new SDL_Rect { x = X, y = Y, w = Width, h = Height };
-
-    var rect = new SDL_Rect { x = 0, y = 0, w = Width, h = Height };
-    SDL_FillRect(Surface, ref rect, SdlUtils.ColorToSurfaceFormat(Surface, Color));
+    var surfaceRect = new SDL_Rect { x = 0, y = 0, w = Width, h = Height };
+    SDL_FillRect(SDL_Surface, ref surfaceRect, SdlUtils.ColorToSurfaceFormat(SDL_Surface, Color));
   }
 }

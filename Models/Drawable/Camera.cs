@@ -17,12 +17,12 @@ public class Camera : DrawableEntity
     : base(x, y, w, h, Color.White)
   {
     _world  = world;
-    Surface = SDL_CreateRGBSurfaceWithFormat(0, Width, Height, 32, SDL_PIXELFORMAT_RGBA8888);
+    SDL_Surface = SDL_CreateRGBSurfaceWithFormat(0, Width, Height, 32, SDL_PIXELFORMAT_RGBA8888);
 
     Update();
   }
 
-  public void Update()
+  public override void Update()
   {
     UpdateScroll();
     UpdateTargetEnds();
@@ -41,12 +41,12 @@ public class Camera : DrawableEntity
     {
       var tile = _world.Tiles[row, col];
 
-      if (!IsEntityInBounds(tile)) continue;
+      if (!ContainsInBounds(tile)) continue;
 
-      var unitDstRect = tile.SDL_Rect;
+      var unitDstRect = SdlUtils.CreateRect(tile);
       unitDstRect.x -= TargetX;
       unitDstRect.y -= TargetY;
-      SDL_BlitSurface(tile.Surface, IntPtr.Zero, Surface, ref unitDstRect);
+      SDL_BlitSurface(tile.SDL_Surface, nint.Zero, SDL_Surface, ref unitDstRect);
     }
   }
 
@@ -99,11 +99,11 @@ public class Camera : DrawableEntity
     UpdateTargetEnds();
   }
 
-  protected bool IsEntityInBounds(DrawableEntity entity)
+  public override bool ContainsInBounds(IRectangleBounds d)
   {
-    return entity.X < TargetEndX
-      && TargetX < entity.EndX
-      && entity.Y < TargetEndY
-      && TargetY < entity.EndY;
+    return d.X < TargetEndX
+      && TargetX < d.EndX
+      && d.Y < TargetEndY
+      && TargetY < d.EndY;
   }
 }

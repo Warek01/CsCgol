@@ -1,0 +1,20 @@
+{
+  "ScreenIndex": 1,
+  "Window": {
+    "FullscreenOnly": false,
+    "InitialFullscreen": false,
+    "InitialWidth": 800,
+    "InitialHeight": 800,
+    "MinWidth": -1,
+    "MinHeight": -1,
+    "MaxWidth": -1,
+    "MaxHeight": -1
+  },
+  "Runtime": {
+    "TargetFps": -1
+  },
+  "Game": {
+    "ScrollSpeed": 10,
+    "FastScrollSpeed": 20
+  }
+}
